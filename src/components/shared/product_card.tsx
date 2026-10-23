@@ -19,11 +19,11 @@ export function ProductCard({ product, className }: ProductCardProps) {
     <Link
       to={`/catalogo/producto/${product.product_slug}`}
       className={cn(
-        "group flex h-full flex-col rounded-[1.4rem] border border-transparent bg-transparent transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-deep",
+        "group flex h-full flex-col rounded-[1.6rem] border border-line/60 bg-white/40 p-3 shadow-[0_8px_30px_-20px_rgba(20,19,18,0.2)] transition-all duration-300 hover:border-gold/45 hover:bg-white/85 hover:shadow-[0_20px_45px_-24px_rgba(20,19,18,0.35)] active:scale-[0.985] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-deep",
         className
       )}
     >
-      <div className="relative aspect-square overflow-hidden rounded-[1.4rem] bg-sand">
+      <div className="relative aspect-square overflow-hidden rounded-[1.25rem] bg-sand">
         <ImageWithFallback
           src={product.image_urls[0] || ""}
           alt={product.product_name}
@@ -42,15 +42,23 @@ export function ProductCard({ product, className }: ProductCardProps) {
           <ArrowUpRight className="size-4" />
         </span>
       </div>
-      <div className="flex flex-1 flex-col px-0.5 pt-4">
+      <div className="flex flex-1 flex-col px-1 pt-3.5">
         <div className="flex items-center justify-between gap-3">
           <span className="label-caps text-[0.55rem] text-gold-deep">{brand?.brand_name || "Vesuviana"}</span>
-          <span className="truncate text-[0.68rem] text-stone/70">{category?.category_name}</span>
+          <span className="truncate text-[0.66rem] text-stone/70">{category?.category_name}</span>
         </div>
         <h3 className="mt-2 font-display text-[1.45rem] leading-[1.05] text-ink transition-colors group-hover:text-gold-deep">
           {product.product_name}
         </h3>
-        <p className="mt-2 line-clamp-2 text-[0.8rem] leading-relaxed text-stone">{product.product_description}</p>
+        <p className="mt-2 line-clamp-2 text-[0.78rem] leading-relaxed text-stone">{product.product_description}</p>
+        {product.product_benefits[0] ? (
+          <div className="mt-auto pt-3">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-sand/60 px-2.5 py-1 text-[0.66rem] font-medium text-gold-deep">
+              <span className="size-1 rounded-full bg-gold-deep" />
+              <span className="line-clamp-1">{product.product_benefits[0]}</span>
+            </span>
+          </div>
+        ) : null}
       </div>
     </Link>
   );

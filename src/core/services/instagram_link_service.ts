@@ -3,26 +3,27 @@ export function normalize_instagram_link(value: string): string | null {
   if (!trimmed_value) {
     return null;
   }
+  let handle = "";
   if (/^https?:\/\//i.test(trimmed_value)) {
     try {
       const parsed_url = new URL(trimmed_value);
       if (!parsed_url.hostname.toLowerCase().includes("instagram.com")) {
         return null;
       }
-      return parsed_url.toString();
+      handle = parsed_url.pathname.replace(/^\/+|\/+$/g, "").split("/")[0] || "";
     } catch {
       return null;
     }
+  } else {
+    handle = trimmed_value
+      .replace(/^(www\.)?instagram\.com\//i, "")
+      .replace(/^@/, "")
+      .replace(/\/+$/, "");
   }
-  const without_prefix = trimmed_value
-    .replace(/^https?:\/\//i, "")
-    .replace(/^(www\.)?instagram\.com\//i, "")
-    .replace(/^@/, "")
-    .replace(/\/+$/, "");
-  if (!/^[A-Za-z0-9._]{1,40}$/.test(without_prefix)) {
+  if (!/^[A-Za-z0-9._]{1,40}$/.test(handle)) {
     return null;
   }
-  return `https://instagram.com/${without_prefix}`;
+  return `https://instagram.com/${handle}`;
 }
 
 export function is_valid_instagram_source(value: string): boolean {

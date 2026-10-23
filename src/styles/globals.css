@@ -104,6 +104,14 @@
     outline-offset: 3px;
   }
 
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"],
+  [type="submit"],
+  a {
+    cursor: pointer;
+  }
+
   img {
     -webkit-user-drag: none;
   }
