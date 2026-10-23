@@ -5,14 +5,11 @@ import {
   ArrowRight,
   ArrowUpRight,
   Check,
-  Crown,
-  Handshake,
   MapPin,
   MessageCircle,
   Search,
   Sparkles,
   TrendingUp,
-  Truck,
   UserRound,
   X
 } from "lucide-react";
@@ -46,19 +43,11 @@ const START_STEPS = [
   }
 ];
 
-const WHOLESALE_PROFILE_ITEMS = [
-  "Salón de belleza, tienda o distribuidora con operación activa.",
-  "Documentación comercial vigente para facturación.",
-  "Interés en construir una relación comercial a largo plazo.",
-  "Disposición para ofrecer asesoría de producto a tus clientes."
-];
-
 export function WholesalePage() {
   const { site_state } = use_vesuviana_app();
   const [search_query, set_search_query] = useState("");
   const [state_filter, set_state_filter] = useState("all");
   const active_advisors = site_state.wholesale_advisors.filter((advisor_item) => advisor_item.is_active);
-  const general_manager = active_advisors.find((advisor_item) => advisor_item.is_general_manager);
   const zone_advisors = active_advisors
     .filter((advisor_item) => !advisor_item.is_general_manager)
     .sort((a, b) => a.state_name.localeCompare(b.state_name, "es"));
@@ -113,24 +102,10 @@ export function WholesalePage() {
               Un portafolio completo, márgenes pensados para revender y un equipo que conoce el mercado venezolano.
               Vesuviana es una alianza, no solo un proveedor.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              {general_manager ? (
-                <a
-                  href={build_whatsapp_url(
-                    general_manager.whatsapp_number,
-                    "Hola, quiero información para convertirme en mayorista de Vesuviana Cosmetics."
-                  )}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gold-bright px-7 text-sm font-semibold text-ink transition-colors hover:bg-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-bright focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
-                >
-                  <MessageCircle className="size-4" />
-                  Solicitar asesoría
-                </a>
-              ) : null}
+            <div className="mt-8">
               <a
                 href="#asesores"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-cream/25 px-7 text-sm font-medium text-cream transition-colors hover:border-cream/60 hover:bg-cream/5"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gold-bright px-7 text-sm font-semibold text-ink transition-colors hover:bg-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-bright focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
               >
                 Buscar mi asesor
                 <ArrowDown className="size-4" />
@@ -185,46 +160,6 @@ export function WholesalePage() {
           </div>
         </div>
       </section>
-
-      {general_manager ? (
-        <section className="bg-sand/45">
-          <div className="page-shell py-14 lg:py-16">
-            <Reveal>
-              <div className="relative overflow-hidden rounded-[2rem] bg-ink p-7 text-cream sm:p-10">
-                <div className="absolute -right-20 -top-20 size-72 rounded-full bg-gold-bright/10 blur-2xl" />
-                <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-                  <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
-                    <span className="flex size-20 shrink-0 items-center justify-center rounded-full border border-gold-bright/40 bg-gold-bright/10 font-display text-3xl text-gold-bright">
-                      MQ
-                    </span>
-                    <div>
-                      <div className="flex items-center gap-2 text-gold-bright">
-                        <Crown className="size-4" />
-                        <span className="label-caps text-[0.54rem]">Gerencia Nacional</span>
-                      </div>
-                      <h2 className="mt-2 font-display text-3xl text-cream sm:text-4xl">{general_manager.advisor_name}</h2>
-                      <p className="mt-1 text-sm text-cream/55">{general_manager.zone_name}</p>
-                      <p className="mt-1 text-[0.7rem] text-cream/40">{format_whatsapp_display(general_manager.whatsapp_number)}</p>
-                    </div>
-                  </div>
-                  <a
-                    href={build_whatsapp_url(
-                      general_manager.whatsapp_number,
-                      "Hola María Victoria, quiero información sobre el programa mayorista de Vesuviana Cosmetics."
-                    )}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-gold-bright px-7 text-sm font-semibold text-ink transition-colors hover:bg-cream"
-                  >
-                    Hablar con gerencia
-                    <ArrowUpRight className="size-4" />
-                  </a>
-                </div>
-              </div>
-            </Reveal>
-          </div>
-        </section>
-      ) : null}
 
       <section id="asesores" className="section-space bg-cream">
         <div className="page-shell">

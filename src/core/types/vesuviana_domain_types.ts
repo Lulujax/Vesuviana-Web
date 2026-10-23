@@ -103,8 +103,15 @@ export interface AdminUser {
   email: string;
   role: AdminRole;
   is_banned: boolean;
+  password_salt: string;
+  password_hash: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface AdminSession {
+  user_id: string;
+  issued_at: string;
 }
 
 export interface AuditLogEntry {
@@ -195,6 +202,7 @@ export interface DistributorInput {
 export interface ModeratorInput {
   full_name: string;
   email: string;
+  password: string;
 }
 
 export interface ImageAdaptationWarning {

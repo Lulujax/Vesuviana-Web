@@ -28,7 +28,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
           src={product.image_urls[0] || ""}
           alt={product.product_name}
           fallback_label={brand?.brand_name || "Vesuviana"}
-          className="size-full transition-transform duration-700 ease-out group-hover:scale-[1.045]"
+          className="size-full object-contain p-3 transition-transform duration-700 ease-out group-hover:scale-[1.045]"
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink/20 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />

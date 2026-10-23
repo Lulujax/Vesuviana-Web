@@ -112,14 +112,14 @@ export function CatalogPage() {
           <Reveal>
             <div className="flex items-center gap-3">
               <span className="h-px w-8 bg-gold-bright" />
-              <span className="label-caps text-gold-bright">Catálogo por marcas</span>
+              <span className="label-caps text-gold-bright">Catálogo</span>
             </div>
             <h1 className="mt-5 max-w-3xl text-balance text-display-section text-cream">
-              Una colección para cada ritual.
+              Cabello que se siente cuidado.
             </h1>
             <p className="mt-5 max-w-xl text-pretty text-sm leading-relaxed text-cream/60 sm:text-base">
-              Explora las fórmulas de Defile, Oleos y Tricomplex. Filtra por marca, categoría o nombre y encuentra el
-              paso que tu rutina estaba esperando.
+              Explora los tratamientos de Defile, Oleos y Tricomplex. Filtra por marca, categoría o nombre y encuentra
+              el producto que tu cabello necesita.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-cream/15 pt-6">
               <span className="text-[0.68rem] uppercase tracking-[0.14em] text-cream/45">
@@ -136,7 +136,7 @@ export function CatalogPage() {
                 <strong className="mr-1.5 font-display text-xl font-normal text-gold-bright">
                   {site_state.products.filter((product_item) => product_item.is_active).length}
                 </strong>
-                fórmulas
+                productos
               </span>
             </div>
           </Reveal>
@@ -239,7 +239,7 @@ export function CatalogPage() {
               </p>
               <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
                 {category_filter === "all"
-                  ? "Todas las fórmulas"
+                  ? "Todos los productos"
                   : available_categories.find((category_item) => category_item.category_id === category_filter)?.category_name}
               </h2>
             </div>
@@ -284,7 +284,7 @@ export function CatalogPage() {
           ) : (
             <EmptyState
               icon={Search}
-              title="No encontramos esa fórmula"
+              title="No encontramos ese producto"
               description="Prueba con otro término de búsqueda o elimina los filtros activos para volver a ver toda la colección."
               className="mt-10"
               action={

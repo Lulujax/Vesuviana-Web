@@ -228,11 +228,22 @@ export function validate_moderator_input(input: ModeratorInput, state: Vesuviana
   if (!EMAIL_PATTERN.test(input.email.trim())) {
     field_errors.email = "Ingresa un correo electrónico válido.";
   }
+  if (input.password.trim().length < 8) {
+    field_errors.password = "La contraseña debe tener al menos 8 caracteres.";
+  }
   const duplicated_user = state.users.find(
     (user_item) => normalize_text(user_item.email) === normalize_text(input.email)
   );
   if (duplicated_user) {
     field_errors.email = "Ya existe un usuario con ese correo.";
+  }
+  throw_if_errors(field_errors);
+}
+
+export function validate_password_reset(new_password: string) {
+  const field_errors: FieldErrorMap = {};
+  if (new_password.trim().length < 8) {
+    field_errors.new_password = "La contraseña debe tener al menos 8 caracteres.";
   }
   throw_if_errors(field_errors);
 }
@@ -282,8 +293,10 @@ export function assert_can_manage_content(active_user: AdminUser) {
   if (active_user.is_banned) {
     throw new VesuvianaAuthorizationException("Tu cuenta está suspendida por el administrador principal.");
   }
-  if (active_user.role !== "SUPER_ADMIN" && active_user.role !== "MODERATOR") {
-    throw new VesuvianaAuthorizationException("No tienes permisos para gestionar el contenido.");
+  if (active_user.role !== "MODERATOR") {
+    throw new VesuvianaAuthorizationException(
+      "El usuario superior supervisa el panel. La edición de contenido corresponde a los moderadores."
+    );
   }
 }
 

@@ -1,4 +1,4 @@
-import type { VesuvianaSiteState } from "@/core/types/vesuviana_domain_types";
+import type { AdminSession, VesuvianaSiteState } from "@/core/types/vesuviana_domain_types";
 import { create_factory_state } from "@/core/data/vesuviana_initial_seed";
 import {
   CURRENT_SCHEMA_VERSION,
@@ -61,19 +61,35 @@ export function save_site_state(state: VesuvianaSiteState) {
   }
 }
 
-export function load_active_user_id(default_user_id: string): string {
+export function load_admin_session(): AdminSession | null {
   try {
-    return get_storage().getItem(STORAGE_KEYS.admin_session) || default_user_id;
+    const raw_value = get_storage().getItem(STORAGE_KEYS.admin_session);
+    if (!raw_value) {
+      return null;
+    }
+    const parsed_session = JSON.parse(raw_value) as AdminSession;
+    return parsed_session.user_id ? parsed_session : null;
   } catch {
-    return default_user_id;
+    return null;
   }
 }
 
-export function save_active_user_id(user_id: string) {
+export function save_admin_session(user_id: string) {
   try {
-    get_storage().setItem(STORAGE_KEYS.admin_session, user_id);
+    get_storage().setItem(
+      STORAGE_KEYS.admin_session,
+      JSON.stringify({ user_id, issued_at: new Date().toISOString() } satisfies AdminSession)
+    );
   } catch {
     throw new VesuvianaStorageException("No pudimos guardar la sesión activa.");
+  }
+}
+
+export function clear_admin_session() {
+  try {
+    get_storage().removeItem(STORAGE_KEYS.admin_session);
+  } catch {
+    throw new VesuvianaStorageException("No pudimos cerrar la sesión.");
   }
 }
 
@@ -82,7 +98,7 @@ export function restore_factory_site_state(): VesuvianaSiteState {
   save_site_state(factory_state);
   const super_admin = factory_state.users.find((user_item) => user_item.role === "SUPER_ADMIN");
   if (super_admin) {
-    save_active_user_id(super_admin.user_id);
+    save_admin_session(super_admin.user_id);
   }
   return factory_state;
 }

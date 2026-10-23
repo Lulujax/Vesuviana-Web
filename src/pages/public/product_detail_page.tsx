@@ -42,10 +42,7 @@ export function ProductDetailPage() {
 
   const brand = site_state.brands.find((brand_item) => brand_item.brand_id === product.brand_id);
   const category = site_state.categories.find((category_item) => category_item.category_id === product.category_id);
-  const general_manager = site_state.wholesale_advisors.find(
-    (advisor_item) => advisor_item.is_general_manager && advisor_item.is_active
-  );
-  const contact_number = general_manager?.whatsapp_number || CONTACT_CONTENT.whatsapp_number;
+  const contact_number = CONTACT_CONTENT.whatsapp_number;
   const related_products = site_state.products
     .filter(
       (related_item) =>
@@ -117,7 +114,7 @@ export function ProductDetailPage() {
                   alt={product.product_name}
                   loading="eager"
                   fallback_label={brand?.brand_name || "Vesuviana"}
-                  className="size-full transition-opacity duration-300"
+                  className="size-full object-contain p-6 transition-opacity duration-300"
                   sizes="(min-width: 1024px) 48vw, 100vw"
                 />
               </div>
@@ -151,7 +148,7 @@ export function ProductDetailPage() {
             </p>
 
             <div className="mt-7">
-              <p className="label-caps text-[0.55rem] text-gold-deep">Beneficios principales</p>
+              <p className="label-caps text-[0.55rem] text-gold-deep">Beneficios</p>
               <ul className="mt-4 space-y-3">
                 {product.product_benefits.map((benefit_item) => (
                   <li key={benefit_item} className="flex items-start gap-3 text-[0.84rem] leading-relaxed text-ink/80">
@@ -169,21 +166,27 @@ export function ProductDetailPage() {
                 Este catálogo es informativo. Para conocer disponibilidad, precio mayorista o recomendación de uso,
                 conversa con nuestro equipo por WhatsApp.
               </p>
-              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                <Button asChild className="flex-1">
+              <div className="mt-4">
+                <Button asChild className="w-full">
                   <a href={whatsapp_url} target="_blank" rel="noreferrer noopener">
                     <MessageCircle className="size-4" />
                     Consultar por WhatsApp
                   </a>
                 </Button>
-                {brand ? (
-                  <Button asChild variant="outline" className="flex-1">
-                    <Link to={`/catalogo?marca=${brand.brand_slug}`}>
-                      Ver {brand.brand_name}
-                      <ArrowUpRight className="size-4" />
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <Button asChild variant="outline" size="sm">
+                    <Link to="/distribuidores">
+                      Distribuidores
+                      <ArrowUpRight className="size-3.5" />
                     </Link>
                   </Button>
-                ) : null}
+                  <Button asChild variant="outline" size="sm">
+                    <Link to="/mayoristas">
+                      Ventas al mayor
+                      <ArrowUpRight className="size-3.5" />
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -217,7 +220,7 @@ export function ProductDetailPage() {
               />
             </div>
             <div>
-              <span className="label-caps text-[0.55rem] text-gold-deep">La casa detrás de la fórmula</span>
+              <span className="label-caps text-[0.55rem] text-gold-deep">La casa detrás del tratamiento</span>
               <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">{brand.brand_name}</h2>
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-stone">{brand.brand_description}</p>
               <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -248,7 +251,7 @@ export function ProductDetailPage() {
             <div className="flex flex-wrap items-end justify-between gap-5">
               <div>
                 <span className="label-caps text-[0.56rem] text-gold-deep">También te puede gustar</span>
-                <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">Completa tu ritual.</h2>
+                <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">Más de la colección.</h2>
               </div>
               <Link
                 to="/catalogo"

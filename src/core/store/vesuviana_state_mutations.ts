@@ -526,7 +526,12 @@ export function delete_distributor_mutation(state: VesuvianaSiteState, distribut
   };
 }
 
-export function create_moderator_mutation(state: VesuvianaSiteState, input: ModeratorInput): StateMutationResult {
+export function create_moderator_mutation(
+  state: VesuvianaSiteState,
+  input: ModeratorInput,
+  password_hash: string,
+  password_salt: string
+): StateMutationResult {
   const timestamp = new Date().toISOString();
   const new_user = {
     user_id: create_identifier("user"),
@@ -534,6 +539,8 @@ export function create_moderator_mutation(state: VesuvianaSiteState, input: Mode
     email: input.email.trim().toLowerCase(),
     role: "MODERATOR" as const,
     is_banned: false,
+    password_hash,
+    password_salt,
     created_at: timestamp,
     updated_at: timestamp
   };
@@ -543,6 +550,33 @@ export function create_moderator_mutation(state: VesuvianaSiteState, input: Mode
       action_type: "CREATE",
       module_name: "USUARIOS",
       change_summary: `Creó al usuario moderador ${new_user.full_name}.`
+    }
+  };
+}
+
+export function reset_user_password_mutation(
+  state: VesuvianaSiteState,
+  user_id: string,
+  password_hash: string,
+  password_salt: string
+): StateMutationResult {
+  const target_user = state.users.find((user_item) => user_item.user_id === user_id);
+  if (!target_user) {
+    throw new VesuvianaNotFoundException("No encontramos al usuario solicitado.");
+  }
+  return {
+    next_state: update_state_timestamp({
+      ...state,
+      users: state.users.map((user_item) =>
+        user_item.user_id === user_id
+          ? { ...user_item, password_hash, password_salt, updated_at: new Date().toISOString() }
+          : user_item
+      )
+    }),
+    audit_input: {
+      action_type: "UPDATE",
+      module_name: "USUARIOS",
+      change_summary: `Restableció la contraseña de ${target_user.full_name}.`
     }
   };
 }

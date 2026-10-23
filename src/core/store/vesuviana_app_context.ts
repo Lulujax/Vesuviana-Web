@@ -13,12 +13,13 @@ import type {
 
 export interface VesuvianaAppContextValue {
   site_state: VesuvianaSiteState;
-  active_user: AdminUser;
+  active_user: AdminUser | null;
   all_users: AdminUser[];
   is_super_admin: boolean;
   can_manage_content: boolean;
   storage_usage_bytes: number;
-  select_active_user: (user_id: string) => void;
+  login: (email: string, password: string) => Promise<AdminUser>;
+  logout: () => void;
   create_slide: (input: SlideInput) => void;
   update_slide: (slide_id: string, input: SlideInput) => void;
   delete_slide: (slide_id: string) => void;
@@ -38,7 +39,8 @@ export interface VesuvianaAppContextValue {
   create_distributor: (input: DistributorInput) => void;
   update_distributor: (distributor_id: string, input: DistributorInput) => void;
   delete_distributor: (distributor_id: string) => void;
-  create_moderator: (input: ModeratorInput) => void;
+  create_moderator: (input: ModeratorInput) => Promise<void>;
+  reset_user_password: (user_id: string, new_password: string) => Promise<void>;
   set_user_ban_status: (user_id: string, should_be_banned: boolean) => void;
   restore_factory_data: () => void;
 }

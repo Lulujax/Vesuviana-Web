@@ -11,6 +11,8 @@ import { ProductDetailPage } from "@/pages/public/product_detail_page";
 import { WholesalePage } from "@/pages/public/wholesale_page";
 import { DistributorsPage } from "@/pages/public/distributors_page";
 import { NotFoundPage } from "@/pages/public/not_found_page";
+import { AdminLoginPage } from "@/pages/admin/admin_login_page";
+import { AdminForgotPasswordPage } from "@/pages/admin/admin_forgot_password_page";
 
 const AdminDashboardPage = lazy(async () => ({
   default: (await import("@/pages/admin/admin_dashboard_page")).AdminDashboardPage
@@ -78,6 +80,9 @@ function AppRoutes() {
         <Route path="distribuidores" element={<DistributorsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
+
+      <Route path="admin/login" element={<AdminLoginPage />} />
+      <Route path="admin/recuperar" element={<AdminForgotPasswordPage />} />
 
       <Route path="admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboardPage />} />

@@ -12,15 +12,17 @@ import type {
 } from "@/core/types/vesuviana_domain_types";
 import { VesuvianaAppContext } from "@/core/store/vesuviana_app_context";
 import {
+  clear_admin_session,
   get_storage_usage_bytes,
-  load_active_user_id,
+  load_admin_session,
   load_site_state,
   restore_factory_site_state,
-  save_active_user_id,
+  save_admin_session,
   save_site_state,
   subscribe_to_storage_changes
 } from "@/core/repositories/vesuviana_local_repository";
 import { create_audit_entry } from "@/core/services/audit_trail_service";
+import { generate_password_salt, hash_password, verify_password } from "@/core/services/auth_service";
 import {
   assert_can_manage_content,
   assert_super_admin,
@@ -29,6 +31,7 @@ import {
   validate_category_input,
   validate_distributor_input,
   validate_moderator_input,
+  validate_password_reset,
   validate_product_input,
   validate_site_state,
   validate_slide_input
@@ -48,6 +51,7 @@ import {
   delete_product_mutation,
   delete_slide_mutation,
   move_slide_mutation,
+  reset_user_password_mutation,
   set_user_ban_mutation,
   update_advisor_mutation,
   update_brand_mutation,
@@ -59,33 +63,28 @@ import {
 } from "@/core/store/vesuviana_state_mutations";
 import { VesuvianaAuthorizationException, VesuvianaNotFoundException } from "@/core/exceptions/vesuviana_domain_exceptions";
 
-const resolve_active_user = (state: VesuvianaSiteState, active_user_id: string): AdminUser => {
-  const selected_user = state.users.find((user_item) => user_item.user_id === active_user_id);
-  if (selected_user) {
-    return selected_user;
+const resolve_session_user = (state: VesuvianaSiteState, user_id: string | null): AdminUser | null => {
+  if (!user_id) {
+    return null;
   }
-  const fallback_super_admin = state.users.find((user_item) => user_item.role === "SUPER_ADMIN");
-  if (!fallback_super_admin) {
-    throw new VesuvianaAuthorizationException("No existe un usuario superior disponible.");
-  }
-  return fallback_super_admin;
+  return state.users.find((user_item) => user_item.user_id === user_id) || null;
 };
 
 export function VesuvianaAppProvider({ children }: { children: ReactNode }) {
   const [site_state, set_site_state] = useState<VesuvianaSiteState>(() => load_site_state());
-  const [active_user_id, set_active_user_id] = useState<string>(() => {
-    const default_super_admin = site_state.users.find((user_item) => user_item.role === "SUPER_ADMIN");
-    const fallback_user_id = default_super_admin?.user_id || site_state.users[0]?.user_id || "";
-    const stored_user_id = load_active_user_id(fallback_user_id);
-    const stored_user_exists = site_state.users.some((user_item) => user_item.user_id === stored_user_id);
-    return stored_user_exists ? stored_user_id : fallback_user_id;
+  const [session_user_id, set_session_user_id] = useState<string | null>(() => {
+    const session = load_admin_session();
+    const state = load_site_state();
+    return session && state.users.some((user_item) => user_item.user_id === session.user_id)
+      ? session.user_id
+      : null;
   });
   const [storage_usage_bytes, set_storage_usage_bytes] = useState<number>(() => get_storage_usage_bytes());
   const site_state_ref = useRef(site_state);
-  const active_user_id_ref = useRef(active_user_id);
+  const session_user_id_ref = useRef(session_user_id);
 
   site_state_ref.current = site_state;
-  active_user_id_ref.current = active_user_id;
+  session_user_id_ref.current = session_user_id;
 
   useEffect(() => {
     const unsubscribe = subscribe_to_storage_changes((next_state) => {
@@ -96,7 +95,15 @@ export function VesuvianaAppProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
-  const active_user = resolve_active_user(site_state, active_user_id);
+  const active_user = resolve_session_user(site_state, session_user_id);
+
+  const require_session_user = (): AdminUser => {
+    const current_user = resolve_session_user(site_state_ref.current, session_user_id_ref.current);
+    if (!current_user) {
+      throw new VesuvianaAuthorizationException("Inicia sesión para continuar.");
+    }
+    return current_user;
+  };
 
   const commit_mutation = (mutation_result: StateMutationResult, actor: AdminUser) => {
     const audit_entry = create_audit_entry(
@@ -118,28 +125,39 @@ export function VesuvianaAppProvider({ children }: { children: ReactNode }) {
 
   const run_content_mutation = (create_result: (state: VesuvianaSiteState, actor: AdminUser) => StateMutationResult) => {
     const current_state = site_state_ref.current;
-    const current_user = resolve_active_user(current_state, active_user_id_ref.current);
+    const current_user = require_session_user();
     assert_can_manage_content(current_user);
-    const mutation_result = create_result(current_state, current_user);
-    commit_mutation(mutation_result, current_user);
+    commit_mutation(create_result(current_state, current_user), current_user);
   };
 
   const run_super_admin_mutation = (create_result: (state: VesuvianaSiteState, actor: AdminUser) => StateMutationResult) => {
     const current_state = site_state_ref.current;
-    const current_user = resolve_active_user(current_state, active_user_id_ref.current);
+    const current_user = require_session_user();
     assert_super_admin(current_user);
-    const mutation_result = create_result(current_state, current_user);
-    commit_mutation(mutation_result, current_user);
+    commit_mutation(create_result(current_state, current_user), current_user);
   };
 
-  const select_active_user = (user_id: string) => {
-    const selected_user = site_state_ref.current.users.find((user_item) => user_item.user_id === user_id);
-    if (!selected_user) {
-      throw new VesuvianaNotFoundException("No encontramos al usuario seleccionado.");
+  const login = async (email: string, password: string): Promise<AdminUser> => {
+    const normalized_email = email.trim().toLowerCase();
+    const target_user = site_state_ref.current.users.find(
+      (user_item) => user_item.email.toLowerCase() === normalized_email
+    );
+    if (!target_user || !(await verify_password(target_user, password))) {
+      throw new VesuvianaAuthorizationException("Correo o contraseña incorrectos.");
     }
-    save_active_user_id(user_id);
-    active_user_id_ref.current = user_id;
-    set_active_user_id(user_id);
+    if (target_user.is_banned) {
+      throw new VesuvianaAuthorizationException("Esta cuenta está suspendida. Contacta al usuario superior.");
+    }
+    save_admin_session(target_user.user_id);
+    session_user_id_ref.current = target_user.user_id;
+    set_session_user_id(target_user.user_id);
+    return target_user;
+  };
+
+  const logout = () => {
+    clear_admin_session();
+    session_user_id_ref.current = null;
+    set_session_user_id(null);
   };
 
   const create_slide = (input: SlideInput) => {
@@ -254,11 +272,22 @@ export function VesuvianaAppProvider({ children }: { children: ReactNode }) {
     run_content_mutation((current_state) => delete_distributor_mutation(current_state, distributor_id));
   };
 
-  const create_moderator = (input: ModeratorInput) => {
-    run_super_admin_mutation((current_state) => {
-      validate_moderator_input(input, current_state);
-      return create_moderator_mutation(current_state, input);
-    });
+  const create_moderator = async (input: ModeratorInput) => {
+    validate_moderator_input(input, site_state_ref.current);
+    const password_salt = generate_password_salt();
+    const password_hash = await hash_password(input.password, password_salt);
+    run_super_admin_mutation((current_state) =>
+      create_moderator_mutation(current_state, input, password_hash, password_salt)
+    );
+  };
+
+  const reset_user_password = async (user_id: string, new_password: string) => {
+    validate_password_reset(new_password);
+    const password_salt = generate_password_salt();
+    const password_hash = await hash_password(new_password, password_salt);
+    run_super_admin_mutation((current_state) =>
+      reset_user_password_mutation(current_state, user_id, password_hash, password_salt)
+    );
   };
 
   const set_user_ban_status = (user_id: string, should_be_banned: boolean) => {
@@ -271,12 +300,15 @@ export function VesuvianaAppProvider({ children }: { children: ReactNode }) {
   };
 
   const restore_factory_data = () => {
-    const current_state = site_state_ref.current;
-    const current_user = resolve_active_user(current_state, active_user_id_ref.current);
+    const current_user = require_session_user();
     assert_super_admin(current_user);
     const factory_state = restore_factory_site_state();
+    const super_admin = factory_state.users.find((user_item) => user_item.role === "SUPER_ADMIN");
+    if (!super_admin) {
+      throw new VesuvianaNotFoundException("No encontramos al usuario superior de fábrica.");
+    }
     const audit_entry = create_audit_entry(
-      current_user,
+      super_admin,
       "UPDATE",
       "SISTEMA",
       "Restauró todos los datos de fábrica de Vesuviana Cosmetics."
@@ -286,12 +318,9 @@ export function VesuvianaAppProvider({ children }: { children: ReactNode }) {
       audit_logs: [audit_entry, ...factory_state.audit_logs]
     };
     save_site_state(restored_state);
-    const super_admin = restored_state.users.find((user_item) => user_item.role === "SUPER_ADMIN");
-    if (super_admin) {
-      save_active_user_id(super_admin.user_id);
-      active_user_id_ref.current = super_admin.user_id;
-      set_active_user_id(super_admin.user_id);
-    }
+    save_admin_session(super_admin.user_id);
+    session_user_id_ref.current = super_admin.user_id;
+    set_session_user_id(super_admin.user_id);
     site_state_ref.current = restored_state;
     set_site_state(restored_state);
     set_storage_usage_bytes(get_storage_usage_bytes());
@@ -301,10 +330,11 @@ export function VesuvianaAppProvider({ children }: { children: ReactNode }) {
     site_state,
     active_user,
     all_users: site_state.users,
-    is_super_admin: active_user.role === "SUPER_ADMIN",
-    can_manage_content: !active_user.is_banned,
+    is_super_admin: active_user?.role === "SUPER_ADMIN",
+    can_manage_content: Boolean(active_user && active_user.role === "MODERATOR" && !active_user.is_banned),
     storage_usage_bytes,
-    select_active_user,
+    login,
+    logout,
     create_slide,
     update_slide,
     delete_slide,
@@ -325,6 +355,7 @@ export function VesuvianaAppProvider({ children }: { children: ReactNode }) {
     update_distributor,
     delete_distributor,
     create_moderator,
+    reset_user_password,
     set_user_ban_status,
     restore_factory_data
   };

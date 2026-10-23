@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Ban, Crown, Plus, ShieldCheck, UserCheck, UsersRound } from "lucide-react";
+import { Ban, Crown, KeyRound, Plus, ShieldCheck, UserCheck, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import { AdminConfirmDelete } from "@/components/admin/admin_confirm_delete";
 import { normalize_admin_error } from "@/components/admin/admin_error";
@@ -22,13 +22,16 @@ import { role_label } from "@/core/services/audit_trail_service";
 import { format_short_date } from "@/core/services/date_format_service";
 import type { AdminUser, FieldErrorMap, ModeratorInput } from "@/core/types/vesuviana_domain_types";
 
-const empty_moderator_input: ModeratorInput = { full_name: "", email: "" };
+const empty_moderator_input: ModeratorInput = { full_name: "", email: "", password: "" };
 
 export function AdminUsersPage() {
-  const { active_user, all_users, create_moderator, set_user_ban_status } = use_vesuviana_app();
+  const { active_user, all_users, create_moderator, reset_user_password, set_user_ban_status } = use_vesuviana_app();
   const [dialog_open, set_dialog_open] = useState(false);
   const [moderator_form, set_moderator_form] = useState<ModeratorInput>(empty_moderator_input);
   const [field_errors, set_field_errors] = useState<FieldErrorMap>({});
+  const [reset_target, set_reset_target] = useState<AdminUser | null>(null);
+  const [reset_password, set_reset_password] = useState("");
+  const [reset_errors, set_reset_errors] = useState<FieldErrorMap>({});
   const sorted_users = all_users.slice().sort((a, b) => {
     if (a.role !== b.role) {
       return a.role === "SUPER_ADMIN" ? -1 : 1;
@@ -42,10 +45,10 @@ export function AdminUsersPage() {
     set_dialog_open(true);
   };
 
-  const handle_submit = () => {
+  const handle_submit = async () => {
     try {
-      create_moderator(moderator_form);
-      toast.success("Moderador creado", { description: "El nuevo usuario ya puede seleccionarse como sesión activa." });
+      await create_moderator(moderator_form);
+      toast.success("Moderador creado", { description: "Ya puede iniciar sesión con su correo y contraseña." });
       set_dialog_open(false);
       set_field_errors({});
     } catch (caught_error) {
@@ -53,6 +56,25 @@ export function AdminUsersPage() {
       set_field_errors(normalized_error.field_errors);
       if (Object.keys(normalized_error.field_errors).length === 0) {
         toast.error("No se pudo crear el moderador", { description: normalized_error.message });
+      }
+    }
+  };
+
+  const handle_reset_password = async () => {
+    if (!reset_target) {
+      return;
+    }
+    try {
+      await reset_user_password(reset_target.user_id, reset_password);
+      toast.success("Contraseña actualizada", { description: `${reset_target.full_name} puede usar su nueva clave.` });
+      set_reset_target(null);
+      set_reset_password("");
+      set_reset_errors({});
+    } catch (caught_error) {
+      const normalized_error = normalize_admin_error(caught_error);
+      set_reset_errors(normalized_error.field_errors);
+      if (Object.keys(normalized_error.field_errors).length === 0) {
+        toast.error("No se pudo actualizar la contraseña", { description: normalized_error.message });
       }
     }
   };
@@ -126,7 +148,7 @@ export function AdminUsersPage() {
                 .slice(0, 2)
                 .map((name_part) => name_part[0])
                 .join("");
-              const is_current_user = user_item.user_id === active_user.user_id;
+              const is_current_user = user_item.user_id === active_user?.user_id;
               const is_protected = user_item.role === "SUPER_ADMIN";
               return (
                 <TableRow key={user_item.user_id}>
@@ -168,25 +190,33 @@ export function AdminUsersPage() {
                           <Crown className="size-3.5" />
                           Protegido
                         </span>
-                      ) : user_item.is_banned ? (
-                        <Button variant="outline" size="sm" onClick={() => handle_ban_status(user_item, false)}>
-                          <UserCheck className="size-3.5" />
-                          Reactivar
-                        </Button>
-                      ) : is_current_user ? (
-                        <span className="text-[0.64rem] text-stone/50">No puedes suspenderte</span>
                       ) : (
-                        <AdminConfirmDelete
-                          title="Suspender usuario"
-                          description={`${user_item.full_name} perderá el acceso inmediato al panel y verá la pantalla de cuenta suspendida. Puedes reactivarlo cuando quieras.`}
-                          confirm_label="Suspender acceso"
-                          on_confirm={() => handle_ban_status(user_item, true)}
-                        >
-                          <Button variant="outline" size="sm">
-                            <Ban className="size-3.5" />
-                            Suspender
+                        <div className="flex items-center gap-2">
+                          <Button variant="outline" size="sm" onClick={() => set_reset_target(user_item)}>
+                            <KeyRound className="size-3.5" />
+                            Clave
                           </Button>
-                        </AdminConfirmDelete>
+                          {user_item.is_banned ? (
+                            <Button variant="outline" size="sm" onClick={() => handle_ban_status(user_item, false)}>
+                              <UserCheck className="size-3.5" />
+                              Reactivar
+                            </Button>
+                          ) : is_current_user ? (
+                            <span className="text-[0.64rem] text-stone/50">No puedes suspenderte</span>
+                          ) : (
+                            <AdminConfirmDelete
+                              title="Suspender usuario"
+                              description={`${user_item.full_name} perderá el acceso inmediato al panel y verá la pantalla de cuenta suspendida. Puedes reactivarlo cuando quieras.`}
+                              confirm_label="Suspender acceso"
+                              on_confirm={() => handle_ban_status(user_item, true)}
+                            >
+                              <Button variant="outline" size="sm">
+                                <Ban className="size-3.5" />
+                                Suspender
+                              </Button>
+                            </AdminConfirmDelete>
+                          )}
+                        </div>
                       )}
                     </div>
                   </TableCell>
@@ -200,8 +230,8 @@ export function AdminUsersPage() {
       <div className="flex items-start gap-3 rounded-2xl border border-line bg-sand/35 p-5">
         <ShieldCheck className="mt-0.5 size-5 shrink-0 text-gold-deep" />
         <p className="text-[0.74rem] leading-relaxed text-stone">
-          Los usuarios creados aquí no requieren contraseña: el acceso a esta demo se realiza mediante el selector de
-          sesión. En un entorno de producción se integraría un proveedor de autenticación.
+          Las contraseñas se guardan con hash y sal, nunca en texto plano. Solo el usuario superior puede crear cuentas,
+          suspenderlas o restablecer sus claves.
         </p>
       </div>
 
@@ -232,6 +262,15 @@ export function AdminUsersPage() {
                 placeholder="camila@vesuvianacosmetics.com"
               />
             </AdminFormField>
+            <AdminFormField label="Contraseña inicial" html_for="moderator_password" error={field_errors.password} required>
+              <Input
+                id="moderator_password"
+                type="password"
+                value={moderator_form.password}
+                onChange={(event) => set_moderator_form((current_form) => ({ ...current_form, password: event.target.value }))}
+                placeholder="Mínimo 8 caracteres"
+              />
+            </AdminFormField>
           </div>
 
           <DialogFooter>
@@ -239,6 +278,37 @@ export function AdminUsersPage() {
               Cancelar
             </Button>
             <Button onClick={handle_submit}>Crear moderador</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={Boolean(reset_target)} onOpenChange={(open) => !open && set_reset_target(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Restablecer contraseña</DialogTitle>
+            <DialogDescription>
+              Define una nueva clave para {reset_target?.full_name}. La sesión abierta del usuario no se cerrará.
+            </DialogDescription>
+          </DialogHeader>
+          <AdminFormField
+            label="Nueva contraseña"
+            html_for="reset_password"
+            error={reset_errors.new_password}
+            required
+          >
+            <Input
+              id="reset_password"
+              type="password"
+              value={reset_password}
+              onChange={(event) => set_reset_password(event.target.value)}
+              placeholder="Mínimo 8 caracteres"
+            />
+          </AdminFormField>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => set_reset_target(null)}>
+              Cancelar
+            </Button>
+            <Button onClick={handle_reset_password}>Guardar clave</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

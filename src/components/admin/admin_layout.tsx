@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Layers3,
   LoaderCircle,
+  LogOut,
   Menu,
   Package,
   RotateCcw,
@@ -30,7 +31,6 @@ import {
   AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { use_vesuviana_app } from "@/core/hooks/use_vesuviana_app";
 import { role_label } from "@/core/services/audit_trail_service";
@@ -59,17 +59,10 @@ const PAGE_TITLES: Record<string, string> = {
 };
 
 export function AdminLayout() {
-  const { active_user, all_users, is_super_admin, storage_usage_bytes, select_active_user, restore_factory_data } =
-    use_vesuviana_app();
+  const { active_user, is_super_admin, logout, restore_factory_data } = use_vesuviana_app();
   const location = useLocation();
   const [is_mobile_open, set_is_mobile_open] = useState(false);
   const visible_nav_items = ADMIN_NAV_ITEMS.filter((nav_item) => !nav_item.super_admin_only || is_super_admin);
-  const initials = active_user.full_name
-    .split(" ")
-    .slice(0, 2)
-    .map((name_part) => name_part[0])
-    .join("");
-  const storage_percentage = Math.min(100, (storage_usage_bytes / (5 * 1024 * 1024)) * 100);
 
   useEffect(() => {
     set_is_mobile_open(false);
@@ -84,8 +77,17 @@ export function AdminLayout() {
     }
   };
 
+  if (!active_user) {
+    return <Navigate to="/admin/login" replace state={{ from: location.pathname }} />;
+  }
+
+  const initials = active_user.full_name
+    .split(" ")
+    .slice(0, 2)
+    .map((name_part) => name_part[0])
+    .join("");
+
   if (active_user.is_banned) {
-    const available_users = all_users.filter((user_item) => !user_item.is_banned);
     return (
       <div className="flex min-h-screen items-center justify-center bg-sand/40 p-5">
         <div className="w-full max-w-lg rounded-[2rem] border border-line bg-cream p-8 text-center shadow-[0_30px_80px_-50px_rgba(20,19,18,0.5)] sm:p-10">
@@ -95,35 +97,18 @@ export function AdminLayout() {
           </span>
           <h1 className="mt-5 font-display text-4xl text-ink">Cuenta suspendida</h1>
           <p className="mt-3 text-sm leading-relaxed text-stone">
-            El acceso de {active_user.full_name} fue suspendido por el usuario superior. Puedes cambiar a otra sesión
-            autorizada o volver al sitio público.
+            El acceso de {active_user.full_name} fue suspendido por el usuario superior. Vuelve al sitio público o
+            contacta al administrador principal.
           </p>
-          {available_users.length > 0 ? (
-            <div className="mt-6 space-y-3 text-left">
-              <label className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-ink" htmlFor="suspended_user_select">
-                Cambiar sesión
-              </label>
-              <Select value={active_user.user_id} onValueChange={select_active_user}>
-                <SelectTrigger id="suspended_user_select" className="bg-white/80">
-                  <SelectValue placeholder="Selecciona un usuario" />
-                </SelectTrigger>
-                <SelectContent>
-                  {available_users.map((user_item) => (
-                    <SelectItem key={user_item.user_id} value={user_item.user_id}>
-                      {user_item.full_name} · {role_label(user_item.role)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          ) : (
-            <p className="mt-6 rounded-xl border border-line bg-sand/50 p-4 text-xs text-stone">
-              No hay otras cuentas activas disponibles en este momento.
-            </p>
-          )}
-          <Button asChild variant="outline" className="mt-5 w-full">
-            <Link to="/">Volver al sitio público</Link>
-          </Button>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            <Button variant="outline" onClick={logout}>
+              <LogOut className="size-4" />
+              Cerrar sesión
+            </Button>
+            <Button asChild>
+              <Link to="/">Volver al sitio público</Link>
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -174,15 +159,6 @@ export function AdminLayout() {
             Ver sitio público
             <ExternalLink className="size-3.5" />
           </Link>
-          <div className="rounded-xl bg-cream/[0.05] p-3.5">
-            <div className="flex items-center justify-between text-[0.62rem] text-cream/45">
-              <span>Almacenamiento local</span>
-              <span>{(storage_usage_bytes / 1024 / 1024).toFixed(2)} MB</span>
-            </div>
-            <div className="mt-2 h-1 overflow-hidden rounded-full bg-cream/10">
-              <div className="h-full rounded-full bg-gold-bright" style={{ width: `${storage_percentage}%` }} />
-            </div>
-          </div>
           {is_super_admin ? (
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -215,10 +191,18 @@ export function AdminLayout() {
             <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gold-bright/15 font-display text-sm text-gold-bright">
               {initials}
             </span>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="truncate text-[0.72rem] font-medium text-cream">{active_user.full_name}</p>
               <p className="truncate text-[0.6rem] text-cream/40">{role_label(active_user.role)}</p>
             </div>
+            <button
+              type="button"
+              onClick={logout}
+              className="flex size-8 shrink-0 items-center justify-center rounded-full text-cream/40 transition-colors hover:bg-cream/10 hover:text-cream"
+              aria-label="Cerrar sesión"
+            >
+              <LogOut className="size-3.5" />
+            </button>
           </div>
         </div>
       </aside>
@@ -260,28 +244,15 @@ export function AdminLayout() {
                     })}
                   </nav>
                   <div className="mt-auto space-y-3 border-t border-cream/10 pt-5">
-                    <Select
-                      value={active_user.user_id}
-                      onValueChange={(user_id) => {
-                        select_active_user(user_id);
-                        toast.success("Sesión cambiada", {
-                          description: "Ahora gestionas el panel con otro usuario."
-                        });
-                        set_is_mobile_open(false);
-                      }}
-                    >
-                      <SelectTrigger className="border-cream/15 bg-cream/5 text-cream" aria-label="Cambiar usuario activo">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {all_users.map((user_item) => (
-                          <SelectItem key={user_item.user_id} value={user_item.user_id}>
-                            {user_item.full_name} · {role_label(user_item.role)}
-                            {user_item.is_banned ? " (suspendido)" : ""}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-3 rounded-xl bg-cream/[0.06] p-3">
+                      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gold-bright/15 font-display text-sm text-gold-bright">
+                        {initials}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[0.72rem] font-medium text-cream">{active_user.full_name}</p>
+                        <p className="truncate text-[0.6rem] text-cream/40">{role_label(active_user.role)}</p>
+                      </div>
+                    </div>
                     <Link
                       to="/"
                       target="_blank"
@@ -290,6 +261,14 @@ export function AdminLayout() {
                       Ver sitio público
                       <ExternalLink className="size-3.5" />
                     </Link>
+                    <button
+                      type="button"
+                      onClick={logout}
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-cream/[0.06] px-3.5 py-2.5 text-[0.72rem] text-cream/60 transition-colors hover:bg-cream/10 hover:text-cream"
+                    >
+                      <LogOut className="size-3.5" />
+                      Cerrar sesión
+                    </button>
                   </div>
                 </SheetContent>
               </Sheet>
@@ -300,26 +279,9 @@ export function AdminLayout() {
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="hidden sm:block">
-                <Select
-                  value={active_user.user_id}
-                  onValueChange={(user_id) => {
-                    select_active_user(user_id);
-                    toast.success("Sesión cambiada", { description: "Los permisos se actualizaron." });
-                  }}
-                >
-                  <SelectTrigger className="h-9 w-56 rounded-full border-line bg-white/60 text-[0.72rem]" aria-label="Cambiar usuario activo">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {all_users.map((user_item) => (
-                      <SelectItem key={user_item.user_id} value={user_item.user_id}>
-                        {user_item.full_name} · {role_label(user_item.role)}
-                        {user_item.is_banned ? " (suspendido)" : ""}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="hidden items-center gap-2 rounded-full border border-line bg-white/50 px-3 py-1.5 sm:flex">
+                <span className="font-display text-xs text-gold-deep">{initials}</span>
+                <span className="text-[0.68rem] text-stone">{role_label(active_user.role)}</span>
               </div>
               <Link
                 to="/"
@@ -329,9 +291,14 @@ export function AdminLayout() {
               >
                 <ArrowUpRight className="size-4" />
               </Link>
-              <span className="flex size-9 items-center justify-center rounded-full bg-ink font-display text-xs text-gold-bright sm:hidden">
-                {initials}
-              </span>
+              <button
+                type="button"
+                onClick={logout}
+                className="inline-flex size-9 items-center justify-center rounded-full border border-line bg-white/50 text-stone transition-colors hover:border-danger/40 hover:text-danger"
+                aria-label="Cerrar sesión"
+              >
+                <LogOut className="size-4" />
+              </button>
             </div>
           </div>
         </header>

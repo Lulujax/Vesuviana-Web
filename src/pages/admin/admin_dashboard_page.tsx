@@ -42,13 +42,19 @@ const get_greeting = () => {
 };
 
 export function AdminDashboardPage() {
-  const { site_state, active_user, is_super_admin, storage_usage_bytes } = use_vesuviana_app();
+  const { site_state, active_user, is_super_admin } = use_vesuviana_app();
   const active_products = site_state.products.filter((product_item) => product_item.is_active).length;
   const active_brands = site_state.brands.filter((brand_item) => brand_item.is_active).length;
   const active_advisors = site_state.wholesale_advisors.filter((advisor_item) => advisor_item.is_active).length;
   const active_distributors = site_state.distributors.filter((distributor_item) => distributor_item.is_active).length;
   const active_slides = site_state.carousel_slides.filter((slide_item) => slide_item.is_active).length;
-  const first_name = active_user.full_name.split(" ")[0];
+  const first_name = active_user?.full_name.split(" ")[0] || "equipo";
+  const quick_actions = is_super_admin
+    ? [
+        { href: "/admin/usuarios", label: "Gestionar usuarios", description: "Crear moderadores y claves.", icon: UsersRound },
+        { href: "/admin/auditoria", label: "Revisar auditoría", description: "Movimientos del panel.", icon: ShieldCheck }
+      ]
+    : QUICK_ACTIONS;
 
   const stat_cards = [
     {
@@ -95,7 +101,11 @@ export function AdminDashboardPage() {
       <AdminPageHeader
         eyebrow="Panel de control"
         title={`${get_greeting()}, ${first_name}.`}
-        description="Este es el estado actual del contenido de Vesuviana Cosmetics. Los cambios que guardes se reflejan de inmediato en el sitio público."
+        description={
+          is_super_admin
+            ? "Supervisa el contenido publicado, las cuentas y la actividad del panel. La edición de contenido corresponde a los moderadores."
+            : "Este es el estado actual del contenido de Vesuviana Cosmetics. Los cambios se reflejan de inmediato en el sitio público."
+        }
         action={
           <>
             <Button asChild variant="outline">
@@ -105,8 +115,8 @@ export function AdminDashboardPage() {
               </Link>
             </Button>
             <Button asChild>
-              <Link to="/admin/productos">
-                Gestionar catálogo
+              <Link to={is_super_admin ? "/admin/usuarios" : "/admin/productos"}>
+                {is_super_admin ? "Gestionar usuarios" : "Gestionar catálogo"}
                 <ArrowUpRight className="size-4" />
               </Link>
             </Button>
@@ -231,18 +241,10 @@ export function AdminDashboardPage() {
             })}
           </div>
           <div className="mt-6 border-t border-cream/10 pt-4">
-            <div className="flex items-center justify-between text-[0.66rem] text-cream/45">
-              <span>Espacio local utilizado</span>
-              <span>{(storage_usage_bytes / 1024 / 1024).toFixed(2)} MB</span>
-            </div>
-            <div className="mt-2 h-1 overflow-hidden rounded-full bg-cream/10">
-              <div
-                className="h-full rounded-full bg-gold-bright"
-                style={{ width: `${Math.min(100, (storage_usage_bytes / (5 * 1024 * 1024)) * 100)}%` }}
-              />
-            </div>
-            <p className="mt-3 text-[0.64rem] leading-relaxed text-cream/35">
-              Las imágenes de archivo se guardan comprimidas. Las URLs remotas no consumen espacio local.
+            <p className="text-[0.64rem] leading-relaxed text-cream/40">
+              {is_super_admin
+                ? "Tu cuenta supervisa accesos y actividad. No modifica el contenido del catálogo."
+                : "Puedes editar carrusel, marcas, productos, asesores y distribuidores."}
             </p>
           </div>
         </section>
@@ -260,7 +262,7 @@ export function AdminDashboardPage() {
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {QUICK_ACTIONS.map((quick_action) => {
+          {quick_actions.map((quick_action) => {
             const IconComponent = quick_action.icon;
             return (
               <Link
@@ -300,7 +302,7 @@ export function AdminDashboardPage() {
           <div>
             <p className="text-sm font-semibold text-ink">Sesión actual</p>
             <p className="mt-1 text-[0.75rem] leading-relaxed text-stone">
-              {active_user.full_name} · {role_label(active_user.role)}
+              {active_user?.full_name} · {active_user ? role_label(active_user.role) : ""}
             </p>
           </div>
         </div>

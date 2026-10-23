@@ -7,10 +7,11 @@ import type {
   ValuePillarContent,
   WholesaleBenefitContent
 } from "@/core/types/vesuviana_content_types";
+import { VESUVIANA_MEDIA } from "@/core/data/vesuviana_media";
 
 export const NAVIGATION_LINKS: NavigationLinkContent[] = [
   { link_id: "nav_home", label: "Inicio", href: "/" },
-  { link_id: "nav_catalog", label: "Catálogo por Marcas", href: "/catalogo" },
+  { link_id: "nav_catalog", label: "Catálogo", href: "/catalogo" },
   { link_id: "nav_wholesale", label: "Ventas al Mayor", href: "/mayoristas" },
   { link_id: "nav_distributors", label: "Distribuidores", href: "/distribuidores" },
   { link_id: "nav_about", label: "Nosotros", href: "/#nosotros" }
@@ -47,7 +48,7 @@ export const VALUE_PILLARS: ValuePillarContent[] = [
     pillar_id: "pillar_bio",
     icon_key: "sprout",
     title: "100% Bio-Activos y Extractos Naturales",
-    description: "Fórmulas con óleos vegetales puros, extractos botánicos seleccionados y biotecnología cosmética."
+    description: "Fórmulas capilares con óleos vegetales puros, extractos botánicos seleccionados y activos de alta performance."
   },
   {
     pillar_id: "pillar_quality",
@@ -62,25 +63,25 @@ export const STORY_VALUES: StoryValueContent[] = [
     value_id: "story_pro_formulas",
     icon_key: "flask",
     title: "Fórmulas profesionales",
-    description: "Desempeño de salón con activos de alta concentración y protocolos claros."
+    description: "Desempeño de salón con activos de alta concentración para cada tipo de cabello."
   },
   {
     value_id: "story_natural_ingredients",
     icon_key: "leaf",
     title: "Ingredientes naturales",
-    description: "Óleos vegetales y extractos botánicos seleccionados por su afinidad con la piel y el cabello."
+    description: "Óleos vegetales y extractos botánicos seleccionados por su afinidad con la fibra capilar."
   },
   {
     value_id: "story_certified_quality",
     icon_key: "badge",
     title: "Calidad certificada",
-    description: "Procesos controlados, lotes trazables y estándares que respaldan cada fórmula."
+    description: "Procesos controlados, lotes trazables y estándares que respaldan cada tratamiento."
   },
   {
     value_id: "story_made_with_love",
     icon_key: "heart",
     title: "Hecho con amor",
-    description: "Una casa venezolana creada por y para quienes viven la belleza como un ritual."
+    description: "Una casa venezolana creada por y para quienes viven el cuidado del cabello como un ritual."
   }
 ];
 
@@ -108,7 +109,7 @@ export const TESTIMONIALS: TestimonialContent[] = [
     customer_name: "Sofía R.",
     customer_city: "Maracaibo",
     brand_name: "Tricomplex",
-    message: "El sérum de vitamina C unificó mi tono en tres semanas. La textura es ligera, se absorbe rápido y no irrita.",
+    message: "El tratamiento de ácido hialurónico devolvió la suavidad a mi cabello. Se siente hidratado sin peso y con brillo natural.",
     timestamp_label: "10:28",
     initials: "SR"
   },
@@ -146,21 +147,20 @@ export const WHOLESALE_BENEFITS: WholesaleBenefitContent[] = [
     benefit_id: "wholesale_portfolio",
     icon_key: "sparkles",
     title: "Portafolio completo",
-    description: "Defile, Oleos y Tricomplex en una sola casa de belleza para cubrir cada necesidad."
+    description: "Defile, Oleos y Tricomplex para cubrir cada necesidad capilar."
   }
 ];
 
 export const HERO_IMAGE_URLS = {
-  hair_portrait: "https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?auto=format&fit=crop&w=1920&h=1080&q=85",
-  salon_space: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1920&h=1080&q=85",
-  amber_bottle: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=1920&h=1080&q=85",
-  dark_cosmetics: "https://images.unsplash.com/photo-1631730359585-38a4935cbec4?auto=format&fit=crop&w=1920&h=1080&q=85"
+  hair_portrait: VESUVIANA_MEDIA.hero.campaign,
+  salon_space: VESUVIANA_MEDIA.lifestyle.defile_ad,
+  amber_bottle: VESUVIANA_MEDIA.lifestyle.oleos_spa,
+  dark_cosmetics: VESUVIANA_MEDIA.hero.editorial
 } as const;
 
 export const STORY_IMAGE_URLS = {
-  main: "https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=1000&h=1200&q=85",
-  secondary: "https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=700&h=700&q=85"
+  main: VESUVIANA_MEDIA.lifestyle.oleos_spa,
+  secondary: VESUVIANA_MEDIA.lifestyle.defile_woman
 } as const;
 
-export const TESTIMONIAL_PHONE_IMAGE_URL =
-  "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&h=1200&q=85";
+export const TESTIMONIAL_PHONE_IMAGE_URL = VESUVIANA_MEDIA.lifestyle.tricomplex_woman;

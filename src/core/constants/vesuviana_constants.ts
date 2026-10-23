@@ -46,12 +46,12 @@ export const IMAGE_RECOMMENDATIONS = {
 } as const;
 
 export const STORAGE_KEYS = {
-  site_state: "vesuviana_cms_state_v1",
-  admin_session: "vesuviana_admin_session_v1"
+  site_state: "vesuviana_cms_state_v2",
+  admin_session: "vesuviana_admin_session_v2"
 } as const;
 
-export const CURRENT_SCHEMA_VERSION = 1;
-export const CURRENT_SEED_VERSION = "1.0.0";
+export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SEED_VERSION = "2.0.0";
 
 export const FALLBACK_WHATSAPP_NUMBER = "+58 412 555 0199";
 export const FALLBACK_CONTACT_EMAIL = "hola@vesuvianacosmetics.com";

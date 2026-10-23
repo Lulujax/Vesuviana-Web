@@ -35,7 +35,7 @@ export function HeroCarousel() {
 
   if (slides.length === 0) {
     return (
-      <section className="flex min-h-[34rem] items-center justify-center bg-ink px-6 text-center text-cream">
+      <section className="flex min-h-[38rem] items-center justify-center bg-ink px-6 text-center text-cream">
         <div>
           <p className="label-caps text-gold-bright">Vesuviana Cosmetics</p>
           <h1 className="mt-4 font-display text-6xl">Belleza que nace del cuidado</h1>
@@ -51,7 +51,7 @@ export function HeroCarousel() {
 
   return (
     <section
-      className="relative flex min-h-[100svh] flex-col overflow-hidden bg-ink text-cream"
+      className="relative flex min-h-[42rem] flex-col overflow-hidden bg-ink text-cream lg:h-[78svh] lg:max-h-[54rem]"
       onMouseEnter={() => set_is_paused(true)}
       onMouseLeave={() => set_is_paused(false)}
       aria-roledescription="carrusel"
@@ -79,8 +79,13 @@ export function HeroCarousel() {
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(20,19,18,0.86)_0%,rgba(20,19,18,0.5)_42%,rgba(20,19,18,0.12)_75%,rgba(20,19,18,0.42)_100%)]" />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,19,18,0.56)_0%,transparent_30%,transparent_64%,rgba(20,19,18,0.85)_100%)]" />
       <div className="absolute inset-y-0 left-[clamp(1.25rem,5vw,4.5rem)] hidden w-px bg-cream/15 lg:block" />
+      <Link
+        to="/catalogo"
+        className="absolute inset-0 z-[8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold-bright"
+        aria-label="Explorar el catálogo de Vesuviana Cosmetics"
+      />
 
-      <div className="page-shell relative z-10 flex flex-1 flex-col justify-end pb-24 pt-32 sm:pb-28 lg:justify-center lg:pb-32">
+      <div className="page-shell pointer-events-none relative z-10 flex flex-1 flex-col justify-end pb-20 pt-32 sm:pb-24 lg:justify-center lg:pb-28">
         <div className="max-w-4xl">
           <AnimatePresence mode="wait">
             <motion.div
@@ -100,27 +105,16 @@ export function HeroCarousel() {
               <p className="mt-6 max-w-xl text-pretty text-sm leading-relaxed text-cream/70 sm:text-base">
                 {active_slide.slide_description}
               </p>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  to={active_slide.cta_href}
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gold-bright px-7 text-sm font-semibold text-ink transition-colors hover:bg-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-bright focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
-                >
-                  {active_slide.cta_label}
-                  <ArrowUpRight className="size-4" />
-                </Link>
-                <a
-                  href="#marcas"
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-cream/25 px-7 text-sm font-medium text-cream backdrop-blur-sm transition-colors hover:border-cream/60 hover:bg-cream/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-bright"
-                >
-                  Conocer las marcas
-                </a>
-              </div>
+              <span className="mt-9 inline-flex items-center gap-2 border-b border-gold-bright/50 pb-1 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-gold-bright">
+                Explorar catálogo
+                <ArrowUpRight className="size-3.5" />
+              </span>
             </motion.div>
           </AnimatePresence>
         </div>
       </div>
 
-      <div className="page-shell relative z-10 flex items-center justify-between gap-6 border-t border-cream/15 py-5">
+      <div className="page-shell relative z-20 flex items-center justify-between gap-6 border-t border-cream/15 py-5">
         <a
           href="#pilares"
           className="group hidden items-center gap-3 text-[0.65rem] uppercase tracking-[0.16em] text-cream/50 transition-colors hover:text-cream sm:flex"
