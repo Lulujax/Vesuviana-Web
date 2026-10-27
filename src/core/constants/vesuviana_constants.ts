@@ -51,7 +51,7 @@ export const STORAGE_KEYS = {
 } as const;
 
 export const CURRENT_SCHEMA_VERSION = 2;
-export const CURRENT_SEED_VERSION = "2.1.0";
+export const CURRENT_SEED_VERSION = "2.2.0";
 
 export const FALLBACK_WHATSAPP_NUMBER = "+58 412 555 0199";
 export const FALLBACK_CONTACT_EMAIL = "hola@vesuvianacosmetics.com";

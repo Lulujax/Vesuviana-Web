@@ -15,10 +15,10 @@ El enlace al panel está en el pie de página del sitio público. No se muestra 
 
 | Persona | Correo | Contraseña | Rol |
 | --- | --- | --- | --- |
-| Eduardo | `eduardo@vesuvianacosmetics.com` | `Vesuviana2026!` | Superadministrador |
-| Sandra Nino | `sandra.nino@vesuvianacosmetics.com` | `Moderadora2026!` | Moderadora de contenido |
+| Administrador | `pruebaadmin@ejemplo.com` | `123123` | Superadministrador |
+| Usuario Normal | `pruebanormal@ejemplo.com` | `123123` | Moderador de contenido |
 
-Estas credenciales corresponden a la semilla de fábrica (`seed_version: 2.0.0`). Si se restauran los datos de fábrica desde el panel, vuelven a quedar activas.
+Estas credenciales corresponden a la semilla de fábrica (`seed_version: 2.2.0`). Si se restauran los datos de fábrica desde el panel, vuelven a quedar activas.
 
 > Importante: las contraseñas se almacenan como hash SHA-256 con salt individual. El sitio es una aplicación frontend con `localStorage`; este esquema sirve para el prototipo y la gestión interna, pero no sustituye la autenticación de un backend en producción.
 
@@ -49,7 +49,7 @@ La navegación del panel se filtra por rol. Las rutas de contenido están proteg
 - Al restaurar la fábrica, la sesión vuelve al superadministrador.
 - Si una cuenta es suspendida mientras tiene sesión abierta, el panel muestra una pantalla de cuenta suspendida y permite cerrar sesión.
 - El hash se calcula como `SHA-256(salt + ":" + contraseña)`.
-- Los salts iniciales son `vesuviana-eduardo-2026` y `vesuviana-sandra-2026`.
+- Los salts iniciales son `vesuviana-admin-test` y `vesuviana-normal-test`.
 - La recuperación de contraseña es informativa: no envía correos. El superadministrador debe restablecer la clave desde `/admin/usuarios`.
 - Para producción se recomienda migrar autenticación, sesiones y datos a un backend, usar un algoritmo de hash lento (Argon2 o bcrypt) y rotar las credenciales iniciales.
 

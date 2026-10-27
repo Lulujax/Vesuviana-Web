@@ -477,24 +477,24 @@ export const VESUVIANA_INITIAL_DISTRIBUTORS: AuthorizedDistributor[] = distribut
 
 export const VESUVIANA_INITIAL_USERS: AdminUser[] = [
   {
-    user_id: "user_super_eduardo",
-    full_name: "Eduardo",
-    email: "eduardo@vesuvianacosmetics.com",
+    user_id: "user_super_admin",
+    full_name: "Administrador",
+    email: "pruebaadmin@ejemplo.com",
     role: "SUPER_ADMIN",
     is_banned: false,
-    password_salt: "vesuviana-eduardo-2026",
-    password_hash: "0df7a9db4bc984c5f464d044a0023501d065d22a7cdf3724a123592f5ef29e19",
+    password_salt: "vesuviana-admin-test",
+    password_hash: "a3df81c5bef5ec7af09c32fd15e4425ef26714d111d276cce043f56358cb0c09",
     created_at: "2026-01-15T09:00:00.000Z",
     updated_at: "2026-01-15T09:00:00.000Z"
   },
   {
-    user_id: "user_moderator_sandra",
-    full_name: "Sandra Nino",
-    email: "sandra.nino@vesuvianacosmetics.com",
+    user_id: "user_moderator_normal",
+    full_name: "Usuario Normal",
+    email: "pruebanormal@ejemplo.com",
     role: "MODERATOR",
     is_banned: false,
-    password_salt: "vesuviana-sandra-2026",
-    password_hash: "ba06bfa097c146d67dd11e0f805da69db09d7448723b3dbe7897184f6f5d2ac3",
+    password_salt: "vesuviana-normal-test",
+    password_hash: "d0e029a2447e9181be81be3d8e2c81eefd2f2f14ce9e1b40a27ee2f38de09e4e",
     created_at: "2026-03-02T10:30:00.000Z",
     updated_at: "2026-03-02T10:30:00.000Z"
   }
@@ -504,8 +504,8 @@ export const VESUVIANA_INITIAL_AUDIT_LOGS: AuditLogEntry[] = [
   {
     log_id: "audit_seed_01",
     occurred_at: "2026-10-18T14:32:00.000Z",
-    actor_user_id: "user_super_eduardo",
-    actor_name: "Eduardo",
+    actor_user_id: "user_super_admin",
+    actor_name: "Administrador",
     actor_role: "SUPER_ADMIN",
     action_type: "UPDATE",
     module_name: "PRODUCTOS",
@@ -514,8 +514,8 @@ export const VESUVIANA_INITIAL_AUDIT_LOGS: AuditLogEntry[] = [
   {
     log_id: "audit_seed_02",
     occurred_at: "2026-10-19T09:15:00.000Z",
-    actor_user_id: "user_moderator_sandra",
-    actor_name: "Sandra Nino",
+    actor_user_id: "user_moderator_normal",
+    actor_name: "Usuario Normal",
     actor_role: "MODERATOR",
     action_type: "CREATE",
     module_name: "DISTRIBUIDORES",
@@ -524,8 +524,8 @@ export const VESUVIANA_INITIAL_AUDIT_LOGS: AuditLogEntry[] = [
   {
     log_id: "audit_seed_03",
     occurred_at: "2026-10-19T16:40:00.000Z",
-    actor_user_id: "user_moderator_sandra",
-    actor_name: "Sandra Nino",
+    actor_user_id: "user_moderator_normal",
+    actor_name: "Usuario Normal",
     actor_role: "MODERATOR",
     action_type: "UPDATE",
     module_name: "CARRUSEL",
