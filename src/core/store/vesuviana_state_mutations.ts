@@ -44,17 +44,6 @@ const update_state_timestamp = (state: VesuvianaSiteState): VesuvianaSiteState =
   last_updated_at: new Date().toISOString()
 });
 
-const assert_active_general_manager = (advisors: WholesaleAdvisor[]) => {
-  const active_general_manager = advisors.find(
-    (advisor_item) => advisor_item.is_general_manager && advisor_item.is_active
-  );
-  if (!active_general_manager) {
-    throw new VesuvianaConflictException(
-      "Debe existir un Asesor en Jefe activo para atender los estados sin cobertura."
-    );
-  }
-};
-
 export function create_slide_mutation(state: VesuvianaSiteState, input: SlideInput): StateMutationResult {
   const timestamp = new Date().toISOString();
   const new_slide: VesuvianaCarouselSlide = {
@@ -377,18 +366,10 @@ export function create_advisor_mutation(state: VesuvianaSiteState, input: Adviso
   const new_advisor: WholesaleAdvisor = {
     advisor_id: create_identifier("advisor"),
     ...input,
-    state_name: input.is_general_manager ? "Nacional" : input.state_name,
-    is_active: input.is_general_manager ? true : input.is_active,
     created_at: timestamp,
     updated_at: timestamp
   };
-  const adjusted_advisors = state.wholesale_advisors.map((advisor_item) =>
-    new_advisor.is_general_manager && advisor_item.is_general_manager
-      ? { ...advisor_item, is_general_manager: false }
-      : advisor_item
-  );
-  const next_advisors = [...adjusted_advisors, new_advisor];
-  assert_active_general_manager(next_advisors);
+  const next_advisors = [...state.wholesale_advisors, new_advisor];
   return {
     next_state: update_state_timestamp({ ...state, wholesale_advisors: next_advisors }),
     audit_input: {
@@ -413,23 +394,17 @@ export function update_advisor_mutation(
       return {
         ...advisor_item,
         ...input,
-        state_name: input.is_general_manager ? "Nacional" : input.state_name,
-        is_active: input.is_general_manager ? true : input.is_active,
         updated_at: new Date().toISOString()
       };
     }
-    if (input.is_general_manager && advisor_item.is_general_manager) {
-      return { ...advisor_item, is_general_manager: false };
-    }
     return advisor_item;
   });
-  assert_active_general_manager(adjusted_advisors);
   return {
     next_state: update_state_timestamp({ ...state, wholesale_advisors: adjusted_advisors }),
     audit_input: {
       action_type: "UPDATE",
       module_name: "ASESORES",
-      change_summary: `Actualizó al asesor «${input.advisor_name}» de ${input.is_general_manager ? "Nacional" : input.state_name}.`
+      change_summary: `Actualizó al asesor «${input.advisor_name}» de ${input.state_name}.`
     }
   };
 }
@@ -440,7 +415,6 @@ export function delete_advisor_mutation(state: VesuvianaSiteState, advisor_id: s
     throw new VesuvianaNotFoundException("No encontramos al asesor solicitado.");
   }
   const next_advisors = state.wholesale_advisors.filter((advisor_item) => advisor_item.advisor_id !== advisor_id);
-  assert_active_general_manager(next_advisors);
   return {
     next_state: update_state_timestamp({ ...state, wholesale_advisors: next_advisors }),
     audit_input: {

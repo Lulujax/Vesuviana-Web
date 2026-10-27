@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowUpRight, LockKeyhole, Menu, MessageCircle } from "lucide-react";
+import { ArrowUpRight, Menu, MessageCircle } from "lucide-react";
 import { VesuvianaLogo } from "@/components/brand/vesuviana_logo";
 import { SocialLinks } from "@/components/shared/social_links";
-import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { CONTACT_CONTENT, NAVIGATION_LINKS } from "@/core/data/vesuviana_landing_content";
 import { build_whatsapp_url, format_whatsapp_display } from "@/core/services/whatsapp_link_service";
@@ -49,7 +48,10 @@ export function SiteNavbar() {
       <div className="page-shell flex h-20 items-center justify-between gap-6">
         <VesuvianaLogo theme={is_transparent ? "light" : "dark"} show_tagline={false} compact />
 
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Navegación principal">
+        <nav
+          className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1 lg:flex"
+          aria-label="Navegación principal"
+        >
           {NAVIGATION_LINKS.map((nav_link) => {
             const is_active = is_link_active(nav_link.href);
             return (
@@ -72,16 +74,6 @@ export function SiteNavbar() {
             );
           })}
         </nav>
-
-        <div className="hidden items-center gap-3 lg:flex">
-          <Button asChild variant={is_transparent ? "outline_light" : "default"} size="sm">
-            <Link to="/admin" aria-label="Acceder al área administrativa">
-              <LockKeyhole className="size-3.5" />
-              Área privada
-              <ArrowUpRight className="size-3.5" />
-            </Link>
-          </Button>
-        </div>
 
         <Sheet open={is_mobile_open} onOpenChange={set_is_mobile_open}>
           <SheetTrigger asChild>
@@ -116,12 +108,6 @@ export function SiteNavbar() {
               ))}
             </nav>
             <div className="mt-auto space-y-5 border-t border-line pt-6">
-              <Button asChild className="w-full" size="lg">
-                <Link to="/admin">
-                  <LockKeyhole className="size-4" />
-                  Área privada
-                </Link>
-              </Button>
               <a
                 href={build_whatsapp_url(
                   CONTACT_CONTENT.whatsapp_number,

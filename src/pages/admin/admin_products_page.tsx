@@ -206,7 +206,7 @@ export function AdminProductsPage() {
       <AdminPageHeader
         eyebrow="Catálogo"
         title="Productos"
-        description="Gestiona las fórmulas de las tres marcas: nombre, descripción, beneficios, fotografías y visibilidad en el catálogo."
+        description="Gestiona los productos de las tres marcas: nombre, descripción, beneficios, fotografías y visibilidad en el catálogo."
         action={
           <Button onClick={open_create_dialog}>
             <Plus className="size-4" />
@@ -462,7 +462,7 @@ export function AdminProductsPage() {
                 rows={4}
                 value={product_form.product_description}
                 onChange={(event) => update_form({ product_description: event.target.value })}
-                placeholder="Describe la fórmula, sus activos y el resultado que ofrece."
+                placeholder="Describe el producto, sus activos y el resultado que ofrece."
               />
             </AdminFormField>
 

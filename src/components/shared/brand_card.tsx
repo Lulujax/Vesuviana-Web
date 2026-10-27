@@ -18,27 +18,39 @@ export function BrandCard({ brand, index = 0, className }: BrandCardProps) {
     <Link
       to={`/catalogo?marca=${brand.brand_slug}`}
       className={cn(
-        "group relative flex min-h-[26rem] flex-col justify-end overflow-hidden rounded-[1.75rem] border border-line/50 transition-all duration-500 hover:border-gold/50 hover:shadow-[0_28px_65px_-30px_rgba(20,19,18,0.55)] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-deep focus-visible:ring-offset-4 focus-visible:ring-offset-cream",
+        "group relative flex min-h-[30rem] flex-col overflow-hidden rounded-[1.75rem] border border-line/50 bg-ink transition-all duration-500 hover:border-gold/50 hover:shadow-[0_28px_65px_-30px_rgba(20,19,18,0.55)] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-deep focus-visible:ring-offset-4 focus-visible:ring-offset-cream",
         className
       )}
     >
-      <ImageWithFallback
-        src={brand.image_url}
-        alt={`Colección ${brand.brand_name}`}
-        fallback_label={brand.brand_name}
-        className="absolute inset-0 size-full transition-transform duration-[900ms] ease-out group-hover:scale-105"
-        sizes="(min-width: 1024px) 33vw, 100vw"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-ink/92 via-ink/35 to-ink/5" />
-      <div className="absolute left-5 top-5 flex h-16 w-32 items-center justify-center rounded-xl bg-cream/95 px-4 shadow-sm backdrop-blur sm:left-6 sm:top-6">
-        {logo_url ? (
-          <img src={logo_url} alt={`Logo ${brand.brand_name}`} className="max-h-9 w-full object-contain" />
-        ) : (
-          <span className="font-display text-2xl text-ink">{brand.brand_name}</span>
-        )}
+      <div className="relative min-h-[16rem] flex-1 overflow-hidden bg-[#181615]">
+        <div aria-hidden="true" className="absolute inset-0">
+          <ImageWithFallback
+            src={brand.image_url}
+            alt=""
+            className="size-full scale-110 object-cover opacity-25 blur-2xl"
+            sizes="(min-width: 1024px) 33vw, 100vw"
+          />
+        </div>
+        <ImageWithFallback
+          src={brand.image_url}
+          alt={`Colección ${brand.brand_name}`}
+          fallback_label={brand.brand_name}
+          loading="eager"
+          className="absolute inset-0 z-[1] size-full object-contain p-3 transition-transform duration-700 ease-out group-hover:scale-[1.02] sm:p-5"
+          sizes="(min-width: 1024px) 33vw, 100vw"
+        />
       </div>
-      <div className="relative z-10 p-6 text-cream sm:p-7">
-        <span className="label-caps text-[0.55rem] text-gold-bright">0{index + 1} · Marca</span>
+      <div className="relative z-10 bg-ink px-6 pb-6 pt-5 text-cream sm:px-7">
+        <div className="flex items-start justify-between gap-4">
+          <span className="label-caps pt-1 text-[0.55rem] text-gold-bright">0{index + 1} · Marca</span>
+          <span className="flex h-12 w-24 shrink-0 items-center justify-center rounded-lg bg-cream/95 px-3 shadow-sm">
+            {logo_url ? (
+              <img src={logo_url} alt={`Logo ${brand.brand_name}`} className="max-h-7 w-full object-contain" />
+            ) : (
+              <span className="font-display text-lg text-ink">{brand.brand_name}</span>
+            )}
+          </span>
+        </div>
         <h3 className="mt-3 font-display text-4xl leading-none">{brand.brand_name}</h3>
         <p className="mt-3 line-clamp-2 max-w-sm text-[0.82rem] leading-relaxed text-cream/75">
           {brand.brand_description}

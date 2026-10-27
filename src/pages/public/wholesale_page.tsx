@@ -2,9 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowDown,
-  ArrowRight,
   ArrowUpRight,
-  Check,
   MapPin,
   MessageCircle,
   Search,
@@ -48,9 +46,10 @@ export function WholesalePage() {
   const [search_query, set_search_query] = useState("");
   const [state_filter, set_state_filter] = useState("all");
   const active_advisors = site_state.wholesale_advisors.filter((advisor_item) => advisor_item.is_active);
-  const zone_advisors = active_advisors
-    .filter((advisor_item) => !advisor_item.is_general_manager)
-    .sort((a, b) => a.state_name.localeCompare(b.state_name, "es"));
+  const active_brands = site_state.brands.filter((brand_item) => brand_item.is_active);
+  const active_categories = site_state.categories.filter((category_item) => category_item.is_active);
+  const zone_advisors = active_advisors.sort((a, b) => a.state_name.localeCompare(b.state_name, "es"));
+  const covered_states_count = new Set(zone_advisors.map((advisor_item) => advisor_item.state_name)).size;
   const available_states = Array.from(new Set(zone_advisors.map((advisor_item) => advisor_item.state_name))).sort((a, b) =>
     a.localeCompare(b, "es")
   );
@@ -116,15 +115,17 @@ export function WholesalePage() {
           <Reveal delay={0.12}>
             <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-cream/15 bg-cream/15">
               <div className="bg-ink/80 p-5 backdrop-blur sm:p-6">
-                <p className="font-display text-4xl text-gold-bright">10</p>
+                <p className="font-display text-4xl text-gold-bright">{String(covered_states_count).padStart(2, "0")}</p>
                 <p className="mt-2 text-[0.62rem] uppercase tracking-[0.14em] text-cream/50">Estados con asesor</p>
               </div>
               <div className="bg-ink/80 p-5 backdrop-blur sm:p-6">
-                <p className="font-display text-4xl text-gold-bright">+11</p>
+                <p className="font-display text-4xl text-gold-bright">
+                  {String(active_categories.length).padStart(2, "0")}
+                </p>
                 <p className="mt-2 text-[0.62rem] uppercase tracking-[0.14em] text-cream/50">Categorías de producto</p>
               </div>
               <div className="bg-ink/80 p-5 backdrop-blur sm:p-6">
-                <p className="font-display text-4xl text-gold-bright">03</p>
+                <p className="font-display text-4xl text-gold-bright">{String(active_brands.length).padStart(2, "0")}</p>
                 <p className="mt-2 text-[0.62rem] uppercase tracking-[0.14em] text-cream/50">Marcas en portafolio</p>
               </div>
               <div className="bg-ink/80 p-5 backdrop-blur sm:p-6">
@@ -276,7 +277,7 @@ export function WholesalePage() {
             <EmptyState
               icon={Search}
               title="No encontramos un asesor con ese filtro"
-              description="Prueba con otro estado o escribe directamente a Gerencia Nacional para que te orientemos."
+              description="Prueba con otro estado o amplía la búsqueda para encontrar al asesor de tu zona."
               className="mt-8"
               action={
                 <Button onClick={clear_filters} variant="outline">
@@ -289,7 +290,7 @@ export function WholesalePage() {
       </section>
 
       <section className="relative overflow-hidden bg-ink text-cream">
-        <div className="page-shell grid gap-12 py-16 lg:grid-cols-[1fr_1fr] lg:gap-20 lg:py-24">
+        <div className="page-shell py-16 lg:py-20">
           <Reveal>
             <SectionHeading
               eyebrow="Cómo empezar"
@@ -297,61 +298,20 @@ export function WholesalePage() {
               description="Un proceso claro, sin promesas vacías. Primero entendemos tu negocio; después construimos la propuesta."
               theme="light"
             />
-            <div className="mt-9 flex flex-col gap-5">
-              {START_STEPS.map((start_step) => (
-                <div key={start_step.step_number} className="flex gap-4">
-                  <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-gold-bright/30 font-display text-sm text-gold-bright">
+          </Reveal>
+          <div className="mt-10 grid gap-4 sm:grid-cols-3">
+            {START_STEPS.map((start_step, start_index) => (
+              <Reveal key={start_step.step_number} delay={start_index * 0.07}>
+                <div className="h-full rounded-2xl border border-cream/12 bg-cream/[0.04] p-6">
+                  <span className="flex size-9 items-center justify-center rounded-full border border-gold-bright/30 font-display text-sm text-gold-bright">
                     {start_step.step_number}
                   </span>
-                  <div>
-                    <h3 className="text-sm font-semibold text-cream">{start_step.step_title}</h3>
-                    <p className="mt-1 max-w-md text-[0.78rem] leading-relaxed text-cream/50">{start_step.step_description}</p>
-                  </div>
+                  <h3 className="mt-5 text-sm font-semibold text-cream">{start_step.step_title}</h3>
+                  <p className="mt-2 text-[0.78rem] leading-relaxed text-cream/50">{start_step.step_description}</p>
                 </div>
-              ))}
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.1}>
-            <div className="rounded-[1.75rem] border border-cream/15 bg-cream/[0.04] p-7 sm:p-8">
-              <div className="flex items-center gap-3">
-                <Handshake className="size-5 text-gold-bright" />
-                <h2 className="font-display text-3xl text-cream">Perfil mayorista</h2>
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-cream/50">
-                Buscamos aliados comprometidos con la experiencia del cliente y con ganas de hacer crecer su categoría
-                de belleza.
-              </p>
-              <ul className="mt-6 space-y-4">
-                {WHOLESALE_PROFILE_ITEMS.map((profile_item) => (
-                  <li key={profile_item} className="flex items-start gap-3 text-[0.8rem] leading-relaxed text-cream/65">
-                    <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-gold-bright/15 text-gold-bright">
-                      <Check className="size-3" />
-                    </span>
-                    {profile_item}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-7 flex items-center gap-3 border-t border-cream/10 pt-5 text-[0.7rem] text-cream/40">
-                <Truck className="size-4 text-gold-bright/70" />
-                Despachos coordinados a toda Venezuela.
-              </div>
-              {general_manager ? (
-                <a
-                  href={build_whatsapp_url(
-                    general_manager.whatsapp_number,
-                    "Hola, cumplo el perfil mayorista y quiero iniciar el proceso con Vesuviana Cosmetics."
-                  )}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-cream text-sm font-semibold text-ink transition-colors hover:bg-gold-bright"
-                >
-                  Iniciar conversación
-                  <ArrowRight className="size-4" />
-                </a>
-              ) : null}
-            </div>
-          </Reveal>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 

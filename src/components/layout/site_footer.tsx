@@ -18,7 +18,7 @@ export function SiteFooter() {
         <div className="max-w-sm">
           <VesuvianaLogo theme="light" link_to="/" />
           <p className="mt-6 text-sm leading-relaxed text-cream/55">
-            Una casa venezolana de belleza que une fórmulas profesionales, bio-activos y el ritual de cuidarse todos los días.
+            Una casa venezolana de belleza capilar que une tratamientos profesionales, bio-activos y el ritual de cuidarse todos los días.
           </p>
           <SocialLinks theme="light" className="mt-7" />
         </div>
@@ -87,11 +87,19 @@ export function SiteFooter() {
 
       <div className="page-shell flex flex-col gap-4 border-t border-cream/10 py-6 text-[0.7rem] text-cream/40 sm:flex-row sm:items-center sm:justify-between">
         <p>© {current_year} Vesuviana Cosmetics. Todos los derechos reservados.</p>
-        <div className="flex items-center gap-5">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
           <span>Defile · Oleos · Tricomplex</span>
           <Link to="/admin" className="transition-colors hover:text-gold-bright">
             Acceso administrativo
           </Link>
+          <a
+            href="https://lulujax.netlify.app"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="transition-colors hover:text-gold-bright"
+          >
+            Diseño web · lulujax
+          </a>
         </div>
       </div>
     </footer>

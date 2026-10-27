@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Crown, MapPin, MessageCircle, Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import { MapPin, MessageCircle, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { AdminConfirmDelete } from "@/components/admin/admin_confirm_delete";
 import { normalize_admin_error } from "@/components/admin/admin_error";
@@ -30,7 +30,6 @@ const build_empty_advisor_input = (): AdvisorInput => ({
   state_name: DEFAULT_VENEZUELA_STATE,
   zone_name: "",
   whatsapp_number: "",
-  is_general_manager: false,
   is_active: true
 });
 
@@ -45,19 +44,9 @@ export function AdminAdvisorsPage() {
 
   const sorted_advisors = site_state.wholesale_advisors
     .slice()
-    .sort((a, b) => {
-      if (a.is_general_manager !== b.is_general_manager) {
-        return a.is_general_manager ? -1 : 1;
-      }
-      return a.state_name.localeCompare(b.state_name, "es");
-    });
-  const general_manager = sorted_advisors.find((advisor_item) => advisor_item.is_general_manager);
+    .sort((a, b) => a.state_name.localeCompare(b.state_name, "es"));
   const state_options = Array.from(
-    new Set(
-      site_state.wholesale_advisors
-        .filter((advisor_item) => !advisor_item.is_general_manager)
-        .map((advisor_item) => advisor_item.state_name)
-    )
+    new Set(site_state.wholesale_advisors.map((advisor_item) => advisor_item.state_name))
   ).sort((a, b) => a.localeCompare(b, "es"));
 
   const filtered_advisors = useMemo(() => {
@@ -90,7 +79,6 @@ export function AdminAdvisorsPage() {
       state_name: advisor_item.state_name,
       zone_name: advisor_item.zone_name,
       whatsapp_number: advisor_item.whatsapp_number,
-      is_general_manager: advisor_item.is_general_manager,
       is_active: advisor_item.is_active
     });
     set_field_errors({});
@@ -99,14 +87,6 @@ export function AdminAdvisorsPage() {
 
   const update_form = (patch: Partial<AdvisorInput>) => {
     set_advisor_form((current_form) => ({ ...current_form, ...patch }));
-  };
-
-  const toggle_general_manager = (is_general_manager: boolean) => {
-    update_form({
-      is_general_manager,
-      state_name: is_general_manager ? "Nacional" : advisor_form.state_name === "Nacional" ? DEFAULT_VENEZUELA_STATE : advisor_form.state_name,
-      is_active: is_general_manager ? true : advisor_form.is_active
-    });
   };
 
   const handle_submit = () => {
@@ -148,7 +128,7 @@ export function AdminAdvisorsPage() {
       <AdminPageHeader
         eyebrow="Red comercial"
         title="Asesores mayoristas"
-        description="Administra los contactos regionales que atienden a mayoristas y distribuidores. Debe existir siempre un asesor en jefe activo."
+        description="Administra los contactos regionales que atienden a mayoristas y distribuidores en todo el país."
         action={
           <Button onClick={open_create_dialog}>
             <Plus className="size-4" />
@@ -156,35 +136,6 @@ export function AdminAdvisorsPage() {
           </Button>
         }
       />
-
-      {general_manager ? (
-        <div className="rounded-2xl border border-gold/30 bg-ink p-6 text-cream">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-4">
-              <span className="flex size-14 shrink-0 items-center justify-center rounded-full border border-gold-bright/40 bg-gold-bright/10 text-gold-bright">
-                <Crown className="size-6" />
-              </span>
-              <div>
-                <p className="label-caps text-[0.52rem] text-gold-bright">Asesor en jefe</p>
-                <h2 className="mt-1 font-display text-3xl leading-none text-cream">{general_manager.advisor_name}</h2>
-                <p className="mt-1.5 text-[0.75rem] text-cream/50">{general_manager.zone_name}</p>
-                <p className="mt-1 text-[0.68rem] text-cream/35">{format_whatsapp_display(general_manager.whatsapp_number)}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <AdminStatusBadge label={general_manager.is_active ? "Activo" : "Inactivo"} tone={general_manager.is_active ? "active" : "inactive"} />
-              <Button variant="outline_light" size="sm" onClick={() => open_edit_dialog(general_manager)}>
-                <Pencil className="size-3.5" />
-                Editar
-              </Button>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="rounded-2xl border border-danger/25 bg-danger/5 p-5 text-sm text-danger">
-          No hay un asesor en jefe activo. Asigna uno para garantizar la atención de los estados sin cobertura.
-        </div>
-      )}
 
       <div className="grid gap-3 rounded-2xl border border-line bg-cream/60 p-4 sm:grid-cols-[1fr_13rem_auto]">
         <div className="relative">
@@ -203,7 +154,6 @@ export function AdminAdvisorsPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todos los estados</SelectItem>
-            <SelectItem value="Nacional">Nacional</SelectItem>
             {state_options.map((state_name) => (
               <SelectItem key={state_name} value={state_name}>
                 {state_name}
@@ -241,23 +191,21 @@ export function AdminAdvisorsPage() {
                     <Button variant="ghost" size="icon_sm" onClick={() => open_edit_dialog(advisor_item)} aria-label={`Editar ${advisor_item.advisor_name}`}>
                       <Pencil className="size-3.5" />
                     </Button>
-                    {!advisor_item.is_general_manager ? (
-                      <AdminConfirmDelete
-                        title="Eliminar asesor"
-                        description={`Se retirará a ${advisor_item.advisor_name} de la red de asesores de ${advisor_item.state_name}.`}
-                        on_confirm={() => handle_delete(advisor_item)}
-                      >
-                        <Button variant="ghost" size="icon_sm" aria-label={`Eliminar ${advisor_item.advisor_name}`}>
-                          <Trash2 className="size-3.5 text-danger" />
-                        </Button>
-                      </AdminConfirmDelete>
-                    ) : null}
+                    <AdminConfirmDelete
+                      title="Eliminar asesor"
+                      description={`Se retirará a ${advisor_item.advisor_name} de la red de asesores de ${advisor_item.state_name}.`}
+                      on_confirm={() => handle_delete(advisor_item)}
+                    >
+                      <Button variant="ghost" size="icon_sm" aria-label={`Eliminar ${advisor_item.advisor_name}`}>
+                        <Trash2 className="size-3.5 text-danger" />
+                      </Button>
+                    </AdminConfirmDelete>
                   </div>
                 </div>
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   <AdminStatusBadge
-                    label={advisor_item.is_general_manager ? "Asesor en jefe" : advisor_item.is_active ? "Activo" : "Inactivo"}
-                    tone={advisor_item.is_general_manager ? "gold" : advisor_item.is_active ? "active" : "inactive"}
+                    label={advisor_item.is_active ? "Activo" : "Inactivo"}
+                    tone={advisor_item.is_active ? "active" : "inactive"}
                   />
                   <span className="inline-flex items-center gap-1 text-[0.62rem] text-stone">
                     <MapPin className="size-3" />
@@ -306,41 +254,21 @@ export function AdminAdvisorsPage() {
               />
             </AdminFormField>
 
-            <div className="flex items-center justify-between rounded-xl border border-gold/25 bg-gold/5 px-4 py-3">
-              <div>
-                <Label htmlFor="advisor_is_general_manager" className="text-sm text-ink">
-                  Asesor en jefe
-                </Label>
-                <p className="mt-0.5 text-[0.66rem] text-stone">Solo puede existir uno. Asume cobertura nacional.</p>
-              </div>
-              <Switch
-                id="advisor_is_general_manager"
-                checked={advisor_form.is_general_manager}
-                onCheckedChange={toggle_general_manager}
-              />
-            </div>
-
             <div className="grid gap-4 sm:grid-cols-2">
-              {advisor_form.is_general_manager ? (
-                <AdminFormField label="Cobertura" html_for="advisor_national_state">
-                  <Input id="advisor_national_state" value="Nacional" disabled />
-                </AdminFormField>
-              ) : (
-                <AdminFormField label="Estado" html_for="advisor_state" error={field_errors.state_name} required>
-                  <Select value={advisor_form.state_name} onValueChange={(state_name) => update_form({ state_name })}>
-                    <SelectTrigger id="advisor_state">
-                      <SelectValue placeholder="Selecciona un estado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {VENEZUELA_STATES.map((state_name) => (
-                        <SelectItem key={state_name} value={state_name}>
-                          {state_name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </AdminFormField>
-              )}
+              <AdminFormField label="Estado" html_for="advisor_state" error={field_errors.state_name} required>
+                <Select value={advisor_form.state_name} onValueChange={(state_name) => update_form({ state_name })}>
+                  <SelectTrigger id="advisor_state">
+                    <SelectValue placeholder="Selecciona un estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {VENEZUELA_STATES.map((state_name) => (
+                      <SelectItem key={state_name} value={state_name}>
+                        {state_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </AdminFormField>
               <AdminFormField label="WhatsApp" html_for="advisor_whatsapp" error={field_errors.whatsapp_number} required>
                 <Input
                   id="advisor_whatsapp"
@@ -371,7 +299,6 @@ export function AdminAdvisorsPage() {
                 id="advisor_is_active"
                 checked={advisor_form.is_active}
                 onCheckedChange={(is_active) => update_form({ is_active })}
-                disabled={advisor_form.is_general_manager}
               />
             </div>
           </div>

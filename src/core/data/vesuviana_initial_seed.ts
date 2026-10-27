@@ -271,7 +271,7 @@ export const VESUVIANA_INITIAL_PRODUCTS: VesuvianaProduct[] = [
     "brand_oleos",
     "cat_oleos_shampoo",
     "Oleos Cuidado Diario · Shampoo + Bálsamo",
-    "Fórmula de uso diario que limpia y acondiciona sin resecar la fibra.",
+    "Limpieza de uso diario que acondiciona sin resecar la fibra.",
     ["Uso diario", "Limpieza equilibrada", "Cabello suave y ligero"],
     [VESUVIANA_MEDIA.products.oleos_cuidado_diario],
     false
@@ -448,7 +448,6 @@ const advisor_seed = [
 
 export const VESUVIANA_INITIAL_ADVISORS: WholesaleAdvisor[] = advisor_seed.map((advisor_item) => ({
   ...advisor_item,
-  is_general_manager: false,
   is_active: true,
   created_at: seeded_at,
   updated_at: seeded_at
@@ -460,7 +459,13 @@ const distributor_seed = [
   { distributor_id: "distributor_carabobo_san_diego", store_name: "Óleos Studio San Diego", state_name: "Carabobo", zone_name: "San Diego", address_line: "Av. Diego Ibarra, Centro Comercial San Diego, Nivel 1, Local 18", whatsapp_number: "+58 416 622 1150", instagram_handle_or_url: "@oleos.studio" },
   { distributor_id: "distributor_caracas_mercedes", store_name: "Vesuviana Atelier Las Mercedes", state_name: "Caracas", zone_name: "Las Mercedes", address_line: "Av. Principal Las Mercedes, Centro Comercial Paseo Las Mercedes, Nivel 1, Local 15", whatsapp_number: "+58 416 201 7734", instagram_handle_or_url: "@vesuviana.atelier" },
   { distributor_id: "distributor_aragua_maracay", store_name: "Belleza Botánica Maracay", state_name: "Aragua", zone_name: "Maracay Centro", address_line: "Av. Bolívar Este, Centro Comercial Parque Aragua, Nivel 1, Local 8", whatsapp_number: "+58 412 447 6620", instagram_handle_or_url: "@bellezabotanica.mcy" },
-  { distributor_id: "distributor_lara_barquisimeto", store_name: "Defile Barquisimeto", state_name: "Lara", zone_name: "Barquisimeto Centro", address_line: "Av. Venezuela, Centro Comercial Barquisimeto, Nivel PB, Local 10", whatsapp_number: "+58 424 318 5507", instagram_handle_or_url: "@defile.bqto" }
+  { distributor_id: "distributor_lara_barquisimeto", store_name: "Defile Barquisimeto", state_name: "Lara", zone_name: "Barquisimeto Centro", address_line: "Av. Venezuela, Centro Comercial Barquisimeto, Nivel PB, Local 10", whatsapp_number: "+58 424 318 5507", instagram_handle_or_url: "@defile.bqto" },
+  { distributor_id: "distributor_zulia_maracaibo", store_name: "Defile Maracaibo", state_name: "Zulia", zone_name: "Maracaibo Norte", address_line: "Av. 5 de Julio, Centro Comercial Lago Mall, Nivel 1, Local 22", whatsapp_number: "+58 424 762 8810", instagram_handle_or_url: "@defile.maracaibo" },
+  { distributor_id: "distributor_miranda_los_teques", store_name: "Óleos Studio Los Teques", state_name: "Miranda", zone_name: "Los Teques Centro", address_line: "Av. Francisco de Miranda, Centro Comercial La Cascada, Nivel PB, Local 6", whatsapp_number: "+58 412 903 1176", instagram_handle_or_url: "@oleos.losteques" },
+  { distributor_id: "distributor_anzoategui_puerto_la_cruz", store_name: "Vesuviana Atelier Puerto La Cruz", state_name: "Anzoátegui", zone_name: "Puerto La Cruz", address_line: "Av. Municipal, Centro Comercial Regina, Nivel 1, Local 14", whatsapp_number: "+58 414 338 9021", instagram_handle_or_url: "@vesuviana.puertolacruz" },
+  { distributor_id: "distributor_bolivar_ciudad_guayana", store_name: "Belleza Botánica Guayana", state_name: "Bolívar", zone_name: "Ciudad Guayana", address_line: "Av. Las Américas, Centro Comercial Orinokia, Nivel 1, Local 9", whatsapp_number: "+58 424 612 4478", instagram_handle_or_url: "@bellezabotanica.guayana" },
+  { distributor_id: "distributor_tachira_san_cristobal", store_name: "Bella Época San Cristóbal", state_name: "Táchira", zone_name: "San Cristóbal Centro", address_line: "Av. 5 de Julio con calle 10, Centro Comercial Barquicenter, Nivel PB, Local 4", whatsapp_number: "+58 417 584 2203", instagram_handle_or_url: "@bellaepoca.tachira" },
+  { distributor_id: "distributor_nueva_esparta_porlamar", store_name: "Óleos Studio Margarita", state_name: "Nueva Esparta", zone_name: "Porlamar", address_line: "Av. Santiago Mariño, Centro Comercial Sambil Margarita, Nivel PB, Local 31", whatsapp_number: "+58 412 774 6608", instagram_handle_or_url: "@oleos.margarita" }
 ];
 
 export const VESUVIANA_INITIAL_DISTRIBUTORS: AuthorizedDistributor[] = distributor_seed.map((distributor_item) => ({

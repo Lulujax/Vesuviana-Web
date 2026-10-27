@@ -78,7 +78,6 @@ export interface WholesaleAdvisor {
   state_name: string;
   zone_name: string;
   whatsapp_number: string;
-  is_general_manager: boolean;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -185,7 +184,6 @@ export interface AdvisorInput {
   state_name: string;
   zone_name: string;
   whatsapp_number: string;
-  is_general_manager: boolean;
   is_active: boolean;
 }
 

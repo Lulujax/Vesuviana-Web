@@ -3,7 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-route
 import { ReactLenis, useLenis } from "lenis/react";
 import { VesuvianaAppProvider } from "@/core/store/vesuviana_app_provider";
 import { PublicLayout } from "@/components/layout/public_layout";
-import { AdminLayout, SuperAdminRoute } from "@/components/admin/admin_layout";
+import { AdminLayout, ModeratorRoute, SuperAdminRoute } from "@/components/admin/admin_layout";
 import { Toaster } from "@/components/ui/sonner";
 import { HomePage } from "@/pages/public/home_page";
 import { CatalogPage } from "@/pages/public/catalog_page";
@@ -86,11 +86,13 @@ function AppRoutes() {
 
       <Route path="admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboardPage />} />
-        <Route path="carrusel" element={<AdminSlidesPage />} />
-        <Route path="marcas" element={<AdminBrandsPage />} />
-        <Route path="productos" element={<AdminProductsPage />} />
-        <Route path="asesores" element={<AdminAdvisorsPage />} />
-        <Route path="distribuidores" element={<AdminDistributorsPage />} />
+        <Route element={<ModeratorRoute />}>
+          <Route path="carrusel" element={<AdminSlidesPage />} />
+          <Route path="marcas" element={<AdminBrandsPage />} />
+          <Route path="productos" element={<AdminProductsPage />} />
+          <Route path="asesores" element={<AdminAdvisorsPage />} />
+          <Route path="distribuidores" element={<AdminDistributorsPage />} />
+        </Route>
         <Route element={<SuperAdminRoute />}>
           <Route path="usuarios" element={<AdminUsersPage />} />
           <Route path="auditoria" element={<AdminAuditPage />} />

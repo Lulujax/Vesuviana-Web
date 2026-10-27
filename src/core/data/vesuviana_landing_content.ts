@@ -48,7 +48,7 @@ export const VALUE_PILLARS: ValuePillarContent[] = [
     pillar_id: "pillar_bio",
     icon_key: "sprout",
     title: "100% Bio-Activos y Extractos Naturales",
-    description: "Fórmulas capilares con óleos vegetales puros, extractos botánicos seleccionados y activos de alta performance."
+    description: "Tratamientos capilares con óleos vegetales puros, extractos botánicos seleccionados y activos de alta performance."
   },
   {
     pillar_id: "pillar_quality",
@@ -62,7 +62,7 @@ export const STORY_VALUES: StoryValueContent[] = [
   {
     value_id: "story_pro_formulas",
     icon_key: "flask",
-    title: "Fórmulas profesionales",
+    title: "Tratamientos profesionales",
     description: "Desempeño de salón con activos de alta concentración para cada tipo de cabello."
   },
   {

@@ -15,11 +15,11 @@ export function NotFoundPage() {
           404<span className="text-gold">.</span>
         </p>
         <h1 className="mt-8 max-w-2xl font-display text-[clamp(2rem,5vw,3.8rem)] leading-[1.02] text-balance text-ink">
-          Esta página se perdió entre las fórmulas.
+          Esta página se perdió entre los tratamientos.
         </h1>
         <p className="mt-5 max-w-xl text-pretty text-sm leading-relaxed text-stone sm:text-base">
           El enlace que buscas no existe o cambió de lugar. Vuelve al inicio o explora el catálogo para encontrar tu
-          próximo ritual Vesuviana.
+          próximo cuidado Vesuviana.
         </p>
         <div className="mt-9 flex flex-col gap-3 sm:flex-row">
           <Button asChild size="lg">

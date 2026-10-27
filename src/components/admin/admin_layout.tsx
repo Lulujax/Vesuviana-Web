@@ -62,7 +62,11 @@ export function AdminLayout() {
   const { active_user, is_super_admin, logout, restore_factory_data } = use_vesuviana_app();
   const location = useLocation();
   const [is_mobile_open, set_is_mobile_open] = useState(false);
-  const visible_nav_items = ADMIN_NAV_ITEMS.filter((nav_item) => !nav_item.super_admin_only || is_super_admin);
+  const visible_nav_items = ADMIN_NAV_ITEMS.filter((nav_item) =>
+    is_super_admin
+      ? nav_item.href === "/admin" || nav_item.super_admin_only
+      : !nav_item.super_admin_only
+  );
 
   useEffect(() => {
     set_is_mobile_open(false);
@@ -323,6 +327,14 @@ export function AdminLayout() {
 export function SuperAdminRoute() {
   const { is_super_admin } = use_vesuviana_app();
   if (!is_super_admin) {
+    return <Navigate to="/admin" replace />;
+  }
+  return <Outlet />;
+}
+
+export function ModeratorRoute() {
+  const { can_manage_content } = use_vesuviana_app();
+  if (!can_manage_content) {
     return <Navigate to="/admin" replace />;
   }
   return <Outlet />;

@@ -174,10 +174,7 @@ export function validate_product_input(input: ProductInput, state: VesuvianaSite
 export function validate_advisor_input(input: AdvisorInput, state: VesuvianaSiteState, current_advisor_id?: string) {
   const field_errors: FieldErrorMap = {};
   get_length_error(field_errors, "advisor_name", input.advisor_name, 2, 90, "El nombre del asesor debe tener entre 2 y 90 caracteres.");
-  const valid_state = input.is_general_manager
-    ? input.state_name === "Nacional" || (VENEZUELA_STATES as readonly string[]).includes(input.state_name)
-    : (VENEZUELA_STATES as readonly string[]).includes(input.state_name);
-  if (!valid_state) {
+  if (!(VENEZUELA_STATES as readonly string[]).includes(input.state_name)) {
     field_errors.state_name = "Selecciona un estado de Venezuela.";
   }
   get_length_error(field_errors, "zone_name", input.zone_name, 2, 140, "La zona debe tener entre 2 y 140 caracteres.");

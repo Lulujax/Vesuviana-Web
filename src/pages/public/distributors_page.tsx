@@ -5,13 +5,13 @@ import {
   BadgeCheck,
   MapPin,
   MessageCircle,
-  Navigation,
   Search,
   ShieldCheck,
   ShoppingBag,
   Store,
   X
 } from "lucide-react";
+import { InstagramIcon } from "@/components/brand/social_icons";
 import { EmptyState } from "@/components/shared/empty_state";
 import { Reveal } from "@/components/shared/reveal";
 import { SectionHeading } from "@/components/shared/section_heading";
@@ -195,9 +195,6 @@ export function DistributorsPage() {
             <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {filtered_distributors.map((distributor_item, distributor_index) => {
                 const instagram_link = normalize_instagram_link(distributor_item.instagram_handle_or_url);
-                const maps_url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                  `${distributor_item.store_name}, ${distributor_item.address_line}, ${distributor_item.state_name}, Venezuela`
-                )}`;
                 return (
                   <Reveal key={distributor_item.distributor_id} delay={(distributor_index % 3) * 0.05}>
                     <article className="group flex h-full flex-col rounded-2xl border border-line bg-white/55 p-6 transition-colors hover:border-gold/40">
@@ -229,24 +226,16 @@ export function DistributorsPage() {
                           <MessageCircle className="size-3.5" />
                           WhatsApp
                         </a>
-                        <a
-                          href={maps_url}
-                          target="_blank"
-                          rel="noreferrer noopener"
-                          className="inline-flex h-9 items-center gap-1.5 rounded-full border border-ink/15 px-4 text-[0.7rem] font-medium text-ink transition-colors hover:border-ink/40"
-                        >
-                          <Navigation className="size-3.5" />
-                          Cómo llegar
-                        </a>
                         {instagram_link ? (
                           <a
                             href={instagram_link}
                             target="_blank"
                             rel="noreferrer noopener"
-                            className="inline-flex h-9 items-center gap-1 rounded-full px-2 text-[0.7rem] font-medium text-gold-deep transition-colors hover:text-ink"
+                            className="inline-flex h-9 items-center gap-1.5 rounded-full border border-ink/15 px-4 text-[0.7rem] font-medium text-ink transition-colors hover:border-ink/40 hover:bg-sand/40"
+                            aria-label={`Abrir Instagram de ${distributor_item.store_name}`}
                           >
+                            <InstagramIcon className="size-3.5" />
                             {get_instagram_display_label(distributor_item.instagram_handle_or_url)}
-                            <ArrowUpRight className="size-3" />
                           </a>
                         ) : null}
                       </div>
